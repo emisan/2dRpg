@@ -15,7 +15,9 @@ public interface World {
     void setupWorldGameObjects(@NonNull final GameScreen gameScreen);
     void drawMap(@NonNull final Graphics2D g2);
     void drawObjects(@NonNull final Graphics2D g2,
-                     final int worldWidth,
-                     final int worldHeight,
+                     final int playerWorldXpos,
+                     final int playerWorldYpos,
+                     final int playerScreenXPos,
+                     final int playerScreenYPos,
                      final int tileSize);
 }

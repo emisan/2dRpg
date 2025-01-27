@@ -73,18 +73,17 @@ public class WorldOne implements World {
     @Override
     public void drawMap(@NonNull final Graphics2D g2)
     {
+        final int playerPosXOnWorldMap = (int)player.getXPosOnWorld();
+        final int playerPosYOnWorldMap = (int)player.getYPosOnWorld();
+        final int playerPosXOnScreen = player.getXPosOnScreen();
+        final int playerPosYOnScreen = player.getYPosOnScreen();
+
         if (worldMap != null)
         {
             for (int row = 0; row < maxWorldRows; row++) {
                 for (int col = 0; col < maxWorldColumns; col++) {
                     final int worldXMapPos = col * tileSize;
                     final int worldYMapPos = row * tileSize;
-
-                    final int playerPosXOnWorldMap = (int)player.getXPosOnWorld();
-                    final int playerPosYOnWorldMap = (int)player.getYPosOnWorld();
-                    final int playerPosXOnScreen = player.getXPosOnScreen();
-                    final int playerPosYOnScreen = player.getYPosOnScreen();
-
                     final int screenPosX = worldXMapPos - playerPosXOnWorldMap + playerPosXOnScreen;
                     final int screenPosY = worldYMapPos - playerPosYOnWorldMap + playerPosYOnScreen;
 
@@ -104,18 +103,24 @@ public class WorldOne implements World {
             g2.drawImage(SpriteLoader.getSprite("misc/error.png"),
                     0, 0, tileSize, tileSize, null);
         }
+        drawObjects(g2, playerPosXOnWorldMap, playerPosYOnWorldMap, playerPosXOnScreen, playerPosYOnScreen, tileSize);
     }
 
     @Override
-    public void drawObjects(Graphics2D g2, final int worldWidth, final int worldHeight, final int tileSize) {
+    public void drawObjects(Graphics2D g2,
+                            final int playerWorldXPos,
+                            final int playerWorldYPos,
+                            final int playerScreenXPos,
+                            final int playerScreenYPos,
+                            final int tileSize) {
         final List<GameObject> objects = worldObjects;
         if (worldObjects != null) {
             for (final GameObject obj : objects) {
                 final int worldXPos = obj.getWorldXPos();
                 final int worldYPos = obj.getWorldYPos();
-                if (worldXPos > 0 && worldXPos <= worldWidth && worldYPos > 0 && worldYPos <= worldHeight) {
-                    g2.drawImage(obj.getImage(), worldXPos, worldYPos, tileSize, tileSize, null);
-                }
+                final int onScreenX = worldXPos - playerWorldXPos + playerScreenXPos;
+                final int onScreenY = worldYPos - playerWorldYPos + playerScreenYPos;
+                g2.drawImage(obj.getImage(), onScreenX, onScreenY, tileSize, tileSize, null);
             }
         }
     }
