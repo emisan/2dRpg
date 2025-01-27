@@ -1,12 +1,9 @@
 package org.kayaman.scene;
 
 import lombok.NonNull;
-import org.kayaman.entities.GameCharacter;
-import org.kayaman.entities.GameObject;
 import org.kayaman.screen.GameScreen;
 
 import java.awt.Graphics2D;
-import java.util.List;
 
 public interface World {
 
