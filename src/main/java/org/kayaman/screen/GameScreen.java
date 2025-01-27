@@ -33,8 +33,6 @@ public class GameScreen extends JPanel implements Runnable {
 
     // world map values for zoom in-out and for collision detection
     private int maxWorldColumns;
-    private int maxWorldWidth;
-    private int maxWorldHeight;
 
     private double zoomFactor;
 
@@ -82,8 +80,8 @@ public class GameScreen extends JPanel implements Runnable {
         world = WorldMapLoader.loadWorldOne(this);
         world.setupWorldGameObjects(this);
         maxWorldColumns = world.getMaxWorldColumns();
-        maxWorldWidth = gpTileSize * maxWorldColumns;
-        maxWorldHeight = gpTileSize * world.getMaxWorldRows();
+        final int maxWorldWidth = gpTileSize * maxWorldColumns;
+        final int maxWorldHeight = gpTileSize * world.getMaxWorldRows();
         initCollisionDetection(maxWorldWidth, maxWorldHeight);
     }
 
@@ -116,7 +114,7 @@ public class GameScreen extends JPanel implements Runnable {
     //TODO
     /**
      * Actually when zooming this destroys rectangle collision detection. Need to fix this.
-     * @param byFactor
+     * @param byFactor zooming factor
      */
     public void zoomInOut(final int byFactor) {
         final int oldWorldWidth = gpTileSize * maxWorldColumns;
@@ -146,7 +144,6 @@ public class GameScreen extends JPanel implements Runnable {
         super.paintComponent(g);
         Graphics2D graphics2D = (Graphics2D) g;
         getWorld().drawMap(graphics2D);
-        getWorld().drawObjects(graphics2D, maxWorldWidth, maxWorldHeight, getTileSize());
         getPlayer().draw(graphics2D);
         graphics2D.dispose(); // graphics context and release any system resources that it is using
     }
@@ -165,10 +162,6 @@ public class GameScreen extends JPanel implements Runnable {
 
     public World getWorld() {
         return world;
-    }
-
-    public int getMaxWorldHeight() {
-        return maxWorldHeight;
     }
 
     @Override
