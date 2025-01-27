@@ -5,12 +5,8 @@ import org.kayaman.entities.GameCharacter;
 import org.kayaman.scene.Tile;
 
 import java.awt.Rectangle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class RectangleCollisionDetector {
-
-    private static final Logger LOGGER = Logger.getLogger(RectangleCollisionDetector.class.getName());
 
     private int characterWorldXPos;
     private int characterWorldYPos;
@@ -25,8 +21,8 @@ public class RectangleCollisionDetector {
     private int topTileIndexRow;
     private int bottomTileIndexRow;
 
-    private int maxWorldWidth;
-    private int maxWorldHeight;
+    private final int maxWorldWidth;
+    private final int maxWorldHeight;
 
     private int tileSize;
     private int movementSpeed;
