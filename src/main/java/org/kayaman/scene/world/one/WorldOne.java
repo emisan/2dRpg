@@ -104,8 +104,8 @@ public class WorldOne implements World {
                             worldYMapPos + tileSize > playerPosYOnWorldMap - playerPosYOnScreen &&
                             worldYMapPos - tileSize < playerPosYOnWorldMap + playerPosYOnScreen)
                     {
-                        drawFasterByScalingImage(
-                                g2, worldMap[row][col].getTileImage(), tileSize, screenPosX, screenPosY);
+                        g2.drawImage(
+                                worldMap[row][col].getTileImage(), screenPosX, screenPosY, tileSize, tileSize, null);
                     }
                 }
             }
