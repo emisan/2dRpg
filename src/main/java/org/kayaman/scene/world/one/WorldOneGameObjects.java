@@ -13,7 +13,7 @@ import java.util.List;
 
 public final class WorldOneGameObjects {
 
-    private static final String DOORS_FOLDER = "/sprites/scene/items/doors/";
+    private static final String DOORS_FOLDER = "/sprites/scene/doors/";
     private static final String KEYS_FOLDER = "/sprites/scene/items/keys/";
     private static final String STONES_FOLDER = "/sprites/scene/items/stones/";
 
@@ -52,10 +52,10 @@ public final class WorldOneGameObjects {
 
     private static void addDoorsAndKeys(@NonNull final GameScreen gameScreen) {
         final int tileSize = gameScreen.getTileSize();
-        addDoorKeyObjects(4, 3, KEYS_FOLDER + "blue_key.png", "blueDoorKey1", tileSize);
         addDoorObjects(5, 3, DOORS_FOLDER + "blue_carpet_door_closed.png", "blueCarpetDoorClosed1", tileSize);
-        addDoorKeyObjects(8, 5, KEYS_FOLDER + "red_key.png", "redDoorKey1", tileSize);
-        addDoorObjects(9, 5, DOORS_FOLDER + "red_carpet_door_closed.png", "redCarpetDoorClosed1", tileSize);
+        addDoorKeyObjects(4, 5, KEYS_FOLDER + "blue_key.png", "blueDoorKey1", tileSize);
+        addDoorObjects(5, 9, DOORS_FOLDER + "red_carpet_door_closed.png", "redCarpetDoorClosed1", tileSize);
+        addDoorKeyObjects(11, 3, KEYS_FOLDER + "red_key.png", "redDoorKey1", tileSize);
 
 //            addDoorObjects(DOORS_FOLDER + "red_carpet_door_open.png", "redDoorOpen1", , tileSize);
 //            addDoorObjects(DOORS_FOLDER + "red_carpet_door_closed.png", "redDoorClosed1", tileSize);

@@ -27,9 +27,10 @@ public class DoorKey implements GameObject {
                                                  final int mapColNum,
                                                  final int tileSize)
     {
-        worldXPos = mapColNum * tileSize;
-        worldYPos = mapRowNum * tileSize;
-        LOGGER.log(Level.INFO, () -> "Door at worldX " + worldXPos + ", worldY " + worldYPos);
+        // we need to subtract by one to get starting index to draw on screen
+        worldXPos = (mapColNum-1) * tileSize;
+        worldYPos = (mapRowNum-1) * tileSize;
+        //LOGGER.log(Level.INFO, () -> "Door at worldX " + worldXPos + ", worldY " + worldYPos);
     }
 
     @Override
