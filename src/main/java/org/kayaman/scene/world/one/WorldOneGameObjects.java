@@ -57,17 +57,6 @@ public final class WorldOneGameObjects {
         addDoorObjects(5, 9, DOORS_FOLDER + "red_carpet_door_closed.png", "redCarpetDoorClosed1", tileSize);
         addDoorKeyObjects(11, 3, KEYS_FOLDER + "red_key.png", "redDoorKey1", tileSize);
 
-//            addDoorObjects(DOORS_FOLDER + "red_carpet_door_open.png", "redDoorOpen1", , tileSize);
-//            addDoorObjects(DOORS_FOLDER + "red_carpet_door_closed.png", "redDoorClosed1", tileSize);
-//            addDoorObjects(DOORS_FOLDER + "green_carpet_door_open.png", "greenDoorOpen1", tileSize);
-//            addDoorObjects(DOORS_FOLDER + "green_carpet_door_closed.png", "greenDoorClosed1", tileSize);
-//            addDoorObjects(DOORS_FOLDER + "orange_carpet_door_open.png", "orangeDoorOpen1", tileSize);
-//            addDoorObjects(DOORS_FOLDER + "orange_carpet_door_closed.png", "orangeDoorClosed1", tileSize);
-//            addDoorKeyObjects(KEYS_FOLDER + "red_key.png", "redKey1", tileSize);
-//            addDoorKeyObjects(KEYS_FOLDER + "green_key.png", "greenKey1", tileSize);
-//            addDoorKeyObjects(KEYS_FOLDER + "yellow_key.png",
-//                    "yellowKey1", true);
-//            addToWorldObjectsList(STONES_FOLDER + "stones1.png", "stones1", tileSize);
     }
 
     static List<GameObject> getGameObjects(@NonNull final GameScreen gameScreen) {
