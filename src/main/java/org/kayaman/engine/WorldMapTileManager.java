@@ -1,4 +1,4 @@
-package org.kayaman.loader;
+package org.kayaman.engine;
 
 import lombok.NonNull;
 import org.kayaman.scene.Tile;

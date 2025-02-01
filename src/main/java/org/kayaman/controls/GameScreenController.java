@@ -14,6 +14,7 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
 
     private int mouseScrollSpeed;
     private final GameScreen gameScreen;
+    private boolean showDrawingTime;
 
     public GameScreenController(@NonNull final GameScreen gameScreen) {
         this.gameScreen = gameScreen;
@@ -46,11 +47,19 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
             //  if zoomInOut-method of game screen is part of gameScreen-updateMovement only one time pressing is needed
             gameScreen.zoomInOut(-1);
         }
+        else if (code == KeyEvent.VK_T) {
+            if (!showDrawingTime) {
+                showDrawingTime = true;
+            }
+            else {
+                showDrawingTime = false;
+            }
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        // actually nothing
+        // actually nothing to do
     }
 
     @Override
@@ -90,5 +99,9 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
             zoom -= mouseScrollSpeed;
         }
         gameScreen.zoomInOut(zoom);
+    }
+
+    public boolean isShowDrawingTime() {
+        return showDrawingTime;
     }
 }

@@ -2,8 +2,9 @@ package org.kayaman.entities;
 
 import lombok.NonNull;
 import org.kayaman.controls.GameCharacterKeyboardController;
-import org.kayaman.controls.RectangleCollisionDetector;
+import org.kayaman.engine.RectangleCollisionDetector;
 
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public interface GameCharacter {
@@ -27,12 +28,6 @@ public interface GameCharacter {
     void setMovementSpeed(final double movementSpeed);
     double getMovementSpeed();
 
-    void setImageUpdateCounter(final int imageUpdateCounter);
-    int getImageUpdateCounter();
-
-    void setImageUpdateSpeed(final int imageUpdateSpeed);
-    int getImageUpdateSpeed();
-
     void setCollisionArea(final Rectangle collisionArea);
     Rectangle getCollisionArea();
 
@@ -41,4 +36,6 @@ public interface GameCharacter {
 
     void setCollisionDetector(@NonNull final RectangleCollisionDetector collisionDetector);
     RectangleCollisionDetector getCollisionDetector();
+
+    void draw(@NonNull final Graphics2D graphics2D);
 }

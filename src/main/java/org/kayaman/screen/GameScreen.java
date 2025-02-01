@@ -2,9 +2,9 @@ package org.kayaman.screen;
 
 import lombok.NonNull;
 import org.kayaman.entities.Player;
-import org.kayaman.controls.GameLoopEngine;
+import org.kayaman.engine.GameLoopEngine;
 import org.kayaman.controls.GameScreenController;
-import org.kayaman.controls.RectangleCollisionDetector;
+import org.kayaman.engine.RectangleCollisionDetector;
 import org.kayaman.loader.WorldMapLoader;
 import org.kayaman.scene.World;
 
@@ -40,9 +40,11 @@ public class GameScreen extends JPanel implements Runnable {
     private transient Player player;
     private transient World world;
 
+    private final GameScreenController gameScreenController;
+
     public GameScreen(final int originalTileSize, final int scaleTile, final int maxScreenCols, final int maxScreenRows)
     {
-        final GameScreenController gameScreenController = new GameScreenController(this);
+        gameScreenController = new GameScreenController(this);
         gameScreenController.setMouseScrollSpeed(4);
         this.addKeyListener(gameScreenController);
         this.addMouseWheelListener(gameScreenController);
@@ -143,9 +145,23 @@ public class GameScreen extends JPanel implements Runnable {
     public void paintComponent(final Graphics g) {
         super.paintComponent(g);
         Graphics2D graphics2D = (Graphics2D) g;
+        final long before = System.nanoTime();
         getWorld().drawMap(graphics2D);
         getPlayer().draw(graphics2D);
+        final long after = System.nanoTime();
+        drawSystemMeasurements(graphics2D, before, after);
         graphics2D.dispose(); // graphics context and release any system resources that it is using
+    }
+
+    private void drawSystemMeasurements(@NonNull final Graphics2D graphics2D ,long before, long after) {
+        if (gameScreenController.isShowDrawingTime()) {
+            after = System.nanoTime();
+            graphics2D.setColor(Color.GREEN);
+            graphics2D.drawString("System measurements:", 10, 100);
+            graphics2D.drawString("===================", 10, 110);
+            graphics2D.drawString("drawing time: " + (after - before)/1000000000.0, 10, 125);
+//            LOGGER.log(Level.INFO, "drawing time: " + (after - before/1000000000.0));
+        }
     }
 
     public Thread getThread() {

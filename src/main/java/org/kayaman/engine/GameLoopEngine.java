@@ -1,8 +1,7 @@
-package org.kayaman.controls;
+package org.kayaman.engine;
 
 import org.kayaman.screen.GameScreen;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class GameLoopEngine {

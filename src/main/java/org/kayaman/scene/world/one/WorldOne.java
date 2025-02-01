@@ -5,11 +5,12 @@ import org.kayaman.entities.GameCharacter;
 import org.kayaman.entities.GameObject;
 import org.kayaman.loader.SpriteLoader;
 import org.kayaman.scene.Tile;
-import org.kayaman.loader.WorldMapTileManager;
+import org.kayaman.engine.WorldMapTileManager;
 import org.kayaman.scene.World;
 import org.kayaman.screen.GameScreen;
 
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class WorldOne implements World {
@@ -71,6 +72,16 @@ public class WorldOne implements World {
     }
 
     @Override
+    public void drawFasterByScalingImage(@NonNull final Graphics2D g2,
+                                         @NonNull final BufferedImage image,
+                                         final int byScale,
+                                         final int screenXPos,
+                                         final int screenYPos)
+    {
+        g2.drawImage(SpriteLoader.getScaledImage(image, byScale), screenXPos, screenYPos, null);
+    }
+
+    @Override
     public void drawMap(@NonNull final Graphics2D g2)
     {
         final int playerPosXOnWorldMap = (int)player.getXPosOnWorld();
@@ -93,15 +104,16 @@ public class WorldOne implements World {
                             worldYMapPos + tileSize > playerPosYOnWorldMap - playerPosYOnScreen &&
                             worldYMapPos - tileSize < playerPosYOnWorldMap + playerPosYOnScreen)
                     {
-                        g2.drawImage(worldMap[row][col].getTileImage(),
-                                screenPosX, screenPosY, tileSize, tileSize, null);
+                        drawFasterByScalingImage(
+                                g2, worldMap[row][col].getTileImage(), tileSize, screenPosX, screenPosY);
                     }
                 }
             }
         }
         else {
-            g2.drawImage(SpriteLoader.getSprite("misc/error.png"),
-                    0, 0, tileSize, tileSize, null);
+            final BufferedImage error = SpriteLoader.getSprite("misc/error.png");
+
+            g2.drawImage(error, 0, 0, null);
         }
         drawObjects(g2, playerPosXOnWorldMap, playerPosYOnWorldMap, playerPosXOnScreen, playerPosYOnScreen, tileSize);
     }
@@ -120,7 +132,7 @@ public class WorldOne implements World {
                 final int worldYPos = obj.getWorldYPos();
                 final int onScreenX = worldXPos - playerWorldXPos + playerScreenXPos;
                 final int onScreenY = worldYPos - playerWorldYPos + playerScreenYPos;
-                g2.drawImage(obj.getImage(), onScreenX, onScreenY, tileSize, tileSize, null);
+                drawFasterByScalingImage(g2, obj.getImage(), tileSize, onScreenX, onScreenY);
             }
         }
     }
