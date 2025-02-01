@@ -1,7 +1,8 @@
 package org.kayaman.entities;
 
 import lombok.NonNull;
-import org.kayaman.controls.RectangleCollisionDetector;
+import org.kayaman.engine.ImageProcessingPerformance;
+import org.kayaman.engine.RectangleCollisionDetector;
 import org.kayaman.controls.GameCharacterKeyboardController;
 import org.kayaman.loader.SpriteLoader;
 import org.kayaman.screen.GameScreen;
@@ -12,7 +13,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
-public class Player implements GameCharacter {
+public class Player implements GameCharacter, ImageProcessingPerformance {
 
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
 
@@ -262,11 +263,20 @@ public class Player implements GameCharacter {
         g.drawRect(collArea.x, collArea.y, collArea.width, collArea.height);
     }
 
-    public void draw(@NonNull final Graphics2D g) {
-        final int tSize= getTileSize();
-        g.drawImage(this.getActualImage(), getXPosOnScreen(), getYPosOnScreen(),
-                tSize, tSize, null, null);
-//        drawCollisionArea(g);
+    @Override
+    public void draw(@NonNull final Graphics2D graphics2d) {
+        drawFasterByScalingImage(graphics2d, getActualImage(), getTileSize(), getXPosOnScreen(), getYPosOnScreen());
+//        drawCollisionArea(g2);
+    }
+
+    @Override
+    public void drawFasterByScalingImage(@NonNull final Graphics2D g2,
+                                         @NonNull final  BufferedImage image,
+                                         final int byScale,
+                                         final int screenXPos,
+                                         final int screenYPos)
+    {
+        g2.drawImage(SpriteLoader.getScaledImage(getActualImage(), getTileSize()), screenXPos, screenYPos, null);
     }
 
     @Override
@@ -327,26 +337,6 @@ public class Player implements GameCharacter {
     @Override
     public double getMovementSpeed() {
         return movementSpeed;
-    }
-
-    @Override
-    public void setImageUpdateCounter(final int imageUpdateCounter) {
-        this.imageUpdateCounter = imageUpdateCounter;
-    }
-
-    @Override
-    public int getImageUpdateCounter() {
-        return imageUpdateCounter;
-    }
-
-    @Override
-    public void setImageUpdateSpeed(final int imageUpdateSpeed) {
-        this.imageUpdateSpeed = imageUpdateSpeed;
-    }
-
-    @Override
-    public int getImageUpdateSpeed() {
-        return imageUpdateSpeed;
     }
 
     @Override

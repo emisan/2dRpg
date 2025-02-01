@@ -1,6 +1,7 @@
-package org.kayaman.controls;
+package org.kayaman.engine;
 
 import lombok.NonNull;
+import org.kayaman.controls.GameCharacterKeyboardController;
 import org.kayaman.entities.GameCharacter;
 import org.kayaman.scene.Tile;
 

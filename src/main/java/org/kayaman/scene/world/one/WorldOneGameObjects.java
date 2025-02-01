@@ -29,11 +29,9 @@ public final class WorldOneGameObjects {
                                       final int tileSize)
     {
         final BufferedImage image = SpriteLoader.getSprite(resourcePathToImageName);
-        if (image != null) {
-            final Door door = new Door(itemName, image);
-            door.setPositionInWorldMapAndOnScreen(worldMapRowNum, worldMapColNum, tileSize);
-            gameObjectInThisWorld.add(door);
-        }
+        final Door door = new Door(itemName, image);
+        door.setPositionInWorldMapAndOnScreen(worldMapRowNum, worldMapColNum, tileSize);
+        gameObjectInThisWorld.add(door);
     }
 
     private static void addDoorKeyObjects(final int worldMapRowNum,
@@ -43,11 +41,9 @@ public final class WorldOneGameObjects {
                                              final int tileSize)
     {
         final BufferedImage image = SpriteLoader.getSprite(resourcePathToImageName);
-        if (image != null) {
-            final DoorKey key = new DoorKey(itemName, image);
-            key.setPositionInWorldMapAndOnScreen(worldMapRowNum, worldMapColNum, tileSize);
-            gameObjectInThisWorld.add(key);
-        }
+        final DoorKey key = new DoorKey(itemName, image);
+        key.setPositionInWorldMapAndOnScreen(worldMapRowNum, worldMapColNum, tileSize);
+        gameObjectInThisWorld.add(key);
     }
 
     private static void addDoorsAndKeys(@NonNull final GameScreen gameScreen) {
