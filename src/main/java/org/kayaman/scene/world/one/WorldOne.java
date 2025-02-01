@@ -78,7 +78,7 @@ public class WorldOne implements World {
                                          final int screenXPos,
                                          final int screenYPos)
     {
-        g2.drawImage(SpriteLoader.getScaledImage(image, byScale), screenXPos, screenYPos, null);
+        // not on world tiles, but on world objects!
     }
 
     @Override
