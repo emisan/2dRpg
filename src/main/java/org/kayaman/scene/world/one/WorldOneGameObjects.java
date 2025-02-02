@@ -5,8 +5,8 @@ import org.kayaman.entities.Door;
 import org.kayaman.entities.DoorKey;
 import org.kayaman.entities.GameObject;
 import org.kayaman.loader.SpriteLoader;
-import org.kayaman.screen.GameScreen;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,7 @@ public final class WorldOneGameObjects {
     {
         final BufferedImage image = SpriteLoader.getSprite(resourcePathToImageName);
         final Door door = new Door(itemName, image);
+        door.setCollisionArea(new Rectangle(0, 0, tileSize, tileSize));
         door.setPositionInWorldMapAndOnScreen(worldMapRowNum, worldMapColNum, tileSize);
         gameObjectInThisWorld.add(door);
     }
@@ -42,12 +43,12 @@ public final class WorldOneGameObjects {
     {
         final BufferedImage image = SpriteLoader.getSprite(resourcePathToImageName);
         final DoorKey key = new DoorKey(itemName, image);
+        key.setCollisionArea(new Rectangle(0, 0, tileSize, tileSize));
         key.setPositionInWorldMapAndOnScreen(worldMapRowNum, worldMapColNum, tileSize);
         gameObjectInThisWorld.add(key);
     }
 
-    private static void addDoorsAndKeys(@NonNull final GameScreen gameScreen) {
-        final int tileSize = gameScreen.getTileSize();
+    private static void addDoorsAndKeys(@NonNull final int tileSize) {
         addDoorObjects(5, 3, DOORS_FOLDER + "blue_carpet_door_closed.png", "blueCarpetDoorClosed1", tileSize);
         addDoorKeyObjects(4, 5, KEYS_FOLDER + "blue_key.png", "blueDoorKey1", tileSize);
         addDoorObjects(5, 9, DOORS_FOLDER + "red_carpet_door_closed.png", "redCarpetDoorClosed1", tileSize);
@@ -55,10 +56,10 @@ public final class WorldOneGameObjects {
 
     }
 
-    static List<GameObject> getGameObjects(@NonNull final GameScreen gameScreen) {
+    public static List<GameObject> getGameObjects(@NonNull final int tileSizeInWorld) {
         if (gameObjectInThisWorld == null) {
             gameObjectInThisWorld = new ArrayList<>();
-            addDoorsAndKeys(gameScreen);
+            addDoorsAndKeys(tileSizeInWorld);
         }
         return gameObjectInThisWorld;
     }

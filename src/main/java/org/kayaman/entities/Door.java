@@ -2,6 +2,7 @@ package org.kayaman.entities;
 
 import lombok.NonNull;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,6 +14,7 @@ public class Door implements GameObject {
     private int worldXPos;
     private int worldYPos;
     private final String itemName;
+    private Rectangle collisionArea;
     private final BufferedImage image;
 
     public Door(@NonNull final String itemName,
@@ -51,5 +53,15 @@ public class Door implements GameObject {
     @Override
     public BufferedImage getImage() {
         return image;
+    }
+
+    @Override
+    public void setCollisionArea(@NonNull final Rectangle collisionArea) {
+        this.collisionArea = collisionArea;
+    }
+
+    @Override
+    public Rectangle getCollisionArea() {
+        return collisionArea;
     }
 }

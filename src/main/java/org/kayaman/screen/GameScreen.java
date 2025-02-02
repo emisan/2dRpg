@@ -1,12 +1,14 @@
 package org.kayaman.screen;
 
 import lombok.NonNull;
+import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
 import org.kayaman.entities.Player;
 import org.kayaman.engine.GameLoopEngine;
-import org.kayaman.controls.GameScreenController;
-import org.kayaman.engine.RectangleCollisionDetector;
+import org.kayaman.engine.controls.GameScreenController;
+import org.kayaman.engine.handler.RectangleTileCollisionDetector;
 import org.kayaman.loader.WorldMapLoader;
 import org.kayaman.scene.World;
+import org.kayaman.scene.world.one.WorldOneGameObjects;
 
 import javax.swing.JPanel;
 import java.awt.Color;
@@ -64,6 +66,7 @@ public class GameScreen extends JPanel implements Runnable {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
+        initGameCharacters();
         initWorldMap();
     }
 
@@ -72,19 +75,27 @@ public class GameScreen extends JPanel implements Runnable {
         this.addKeyListener(player.getGameCharacterKeyboardController());
     }
 
-    private void initCollisionDetection(final int maxWorldWidth, final int maxWorldHeight) {
-        this.player.setCollisionDetector(
-                new RectangleCollisionDetector(getWorld().getWorldMap(), maxWorldWidth, maxWorldHeight));
-    }
-
     private void initWorldMap() {
-        initGameCharacters();
         world = WorldMapLoader.loadWorldOne(this);
-        world.setupWorldGameObjects(this);
+        world.setWorldGameObjects(WorldOneGameObjects.getGameObjects(getTileSize()));
         maxWorldColumns = world.getMaxWorldColumns();
         final int maxWorldWidth = gpTileSize * maxWorldColumns;
         final int maxWorldHeight = gpTileSize * world.getMaxWorldRows();
-        initCollisionDetection(maxWorldWidth, maxWorldHeight);
+        initCollisionDetection(world, maxWorldWidth, maxWorldHeight);
+    }
+
+    private void initCollisionDetection(@NonNull final World onWorld,
+                                        final int maxWorldWidth,
+                                        final int maxWorldHeight)
+    {
+        final RectangleTileCollisionDetector tileCollisionDetector =
+                new RectangleTileCollisionDetector(getWorld().getWorldMap(), maxWorldWidth, maxWorldHeight);
+        tileCollisionDetector.prepareCollisionCheckCoordinates(player);
+        player.setCollisionDetector(tileCollisionDetector);
+
+        final RectangleGameObjectCollisionDetection gameObjectsCollisionDetector =
+                new RectangleGameObjectCollisionDetection(onWorld.getWorldGameObjects());
+        player.setGameObjectsCollisionDetector(gameObjectsCollisionDetector);
     }
 
     public Player getPlayer() {

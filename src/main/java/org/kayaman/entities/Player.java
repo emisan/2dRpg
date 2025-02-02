@@ -2,8 +2,10 @@ package org.kayaman.entities;
 
 import lombok.NonNull;
 import org.kayaman.engine.ImageProcessingPerformance;
-import org.kayaman.engine.RectangleCollisionDetector;
-import org.kayaman.controls.GameCharacterKeyboardController;
+import org.kayaman.engine.handler.ItemInventoryHandler;
+import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
+import org.kayaman.engine.handler.RectangleTileCollisionDetector;
+import org.kayaman.engine.controls.GameCharacterKeyboardController;
 import org.kayaman.loader.SpriteLoader;
 import org.kayaman.screen.GameScreen;
 
@@ -11,6 +13,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Player implements GameCharacter, ImageProcessingPerformance {
@@ -40,14 +43,25 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     private int imageUpdateSpeed;
 
     private Rectangle collisionArea;
+    private RectangleTileCollisionDetector playCollisionDetection;
+    private RectangleGameObjectCollisionDetection gameObjectCollisionDetection;
 
-    private RectangleCollisionDetector playCollisionDetection;
+    private ItemInventoryHandler itemInventoryHandler;
     private GameCharacterKeyboardController gameCharacterKeyboardController;
 
     public Player(@NonNull GameScreen gameScreen)
     {
-        setDefaults();
-        gameCharacterKeyboardController = new GameCharacterKeyboardController();
+        setDefaults(gameScreen);
+        initMovementImages();
+    }
+
+    private void setDefaults(@NonNull GameScreen gameScreen) {
+        upCounter = -1;
+        leftCounter = -1;
+        rightCounter = -1;
+        downCounter = -1;
+        imageUpdateSpeed = 12;
+        imageUpdateCounter = 0;
         tileSize = gameScreen.getTileSize();
         // where player starts on world x-index and y-index world map array coordinates multiplied by tileSize
         // this affects moving through the world x-y- index coordinates
@@ -58,17 +72,8 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
         yPosOnScreen = gameScreen.getHeight()/2 - tileSize/2;
         movementSpeed = 4;
         collisionArea = new Rectangle(tileSize/4, tileSize/2, tileSize/2, tileSize/2);
-        initMovementImages();
-        this.actualImage = getDownMovements()[0]; // default stand still, look forward
-    }
-
-    private void setDefaults() {
-        upCounter = -1;
-        leftCounter = -1;
-        rightCounter = -1;
-        downCounter = -1;
-        imageUpdateSpeed = 12;
-        imageUpdateCounter = 0;
+        gameCharacterKeyboardController = new GameCharacterKeyboardController();
+        itemInventoryHandler = new ItemInventoryHandler();
     }
 
     private void initMovementImages() {
@@ -97,6 +102,7 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
                 SpriteLoader.getSprite(resourceFolder + "PlayerMain_e_2.png"),
                 SpriteLoader.getSprite(resourceFolder + "PlayerMain_e_3.png")
                 };
+        this.actualImage = getDownMovements()[0]; // default stand still, look forward
     }
 
     private void setActualImage(@NonNull final BufferedImage actualImage) {
@@ -216,23 +222,19 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     }
 
     public void update() {
-        updateMovement();
+        updateMovementAndCheckCollisions();
     }
 
-    private void updateMovement() {
+    private void updateMovementAndCheckCollisions() {
         final boolean leftPressed = gameCharacterKeyboardController.getLeftPressed();
         final boolean rightPressed = gameCharacterKeyboardController.getRightPressed();
         final boolean upPressed = gameCharacterKeyboardController.getUpPressed();
         final boolean downPressed = gameCharacterKeyboardController.getDownPressed();
         final String direction = gameCharacterKeyboardController.getLastDirection();
 
-        final boolean collision = playCollisionDetection.hasPlayerCollisionOnWorldTiles(this);
+        final boolean collision = playCollisionDetection.hasCollisionOnWorldTiles(this);
+//        final GameObject colliedWithGameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
 
-//        if (!leftPressed && !rightPressed && !downPressed && !upPressed)
-//        {
-//            gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.STAND_STILL);
-//            setUpdateToFirstImageStandingStillRelatedToDirection(direction);
-//        }
         if (leftPressed && !collision) {
             updateLeftMovementImages();
             gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.LAST_DIRECTION_LEFT);
@@ -253,6 +255,12 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
             gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.STAND_STILL);
             setUpdateToFirstImageStandingStillRelatedToDirection(direction);
         }
+
+//        if (colliedWithGameObject != null) {
+//            LOGGER.log(Level.INFO, "Picking up " + colliedWithGameObject.getItemName() + " to itemInventoryHandler");
+//            itemInventoryHandler.addToInventory(colliedWithGameObject);
+//            gameObjectCollisionDetection.removeGameObject(colliedWithGameObject);
+//        }
     }
 
     private void drawCollisionArea(@NonNull final Graphics2D g) {
@@ -362,12 +370,23 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     }
 
     @Override
-    public void setCollisionDetector(@NonNull final RectangleCollisionDetector collisionDetector) {
-        this.playCollisionDetection = collisionDetector;
+    public void setCollisionDetector(@NonNull final RectangleTileCollisionDetector collisionDetector) {
+        playCollisionDetection = collisionDetector;
     }
 
     @Override
-    public RectangleCollisionDetector getCollisionDetector() {
+    public RectangleTileCollisionDetector getCollisionDetector() {
         return this.playCollisionDetection;
+    }
+
+    @Override
+    public void setGameObjectsCollisionDetector(@NonNull final RectangleGameObjectCollisionDetection collisionDetector)
+    {
+        gameObjectCollisionDetection = collisionDetector;
+    }
+
+    @Override
+    public RectangleGameObjectCollisionDetection getGameObjectsCollisionDetector() {
+        return gameObjectCollisionDetection;
     }
 }

@@ -1,13 +1,13 @@
-package org.kayaman.engine;
+package org.kayaman.engine.handler;
 
 import lombok.NonNull;
-import org.kayaman.controls.GameCharacterKeyboardController;
+import org.kayaman.engine.controls.GameCharacterKeyboardController;
 import org.kayaman.entities.GameCharacter;
 import org.kayaman.scene.Tile;
 
 import java.awt.Rectangle;
 
-public class RectangleCollisionDetector {
+public class RectangleTileCollisionDetector implements CollisionDetector {
 
     private int characterWorldXPos;
     private int characterWorldYPos;
@@ -30,16 +30,17 @@ public class RectangleCollisionDetector {
 
     private final Tile[][] collisionMap;
 
-    public RectangleCollisionDetector(@NonNull final Tile[][] worldMap,
-                                      final int maxWorldWidth,
-                                      final int maxWorldHeight)
+    public RectangleTileCollisionDetector(@NonNull final Tile[][] worldMap,
+                                          final int maxWorldWidth,
+                                          final int maxWorldHeight)
     {
         collisionMap = worldMap;
         this.maxWorldWidth = maxWorldWidth;
         this.maxWorldHeight = maxWorldHeight;
     }
 
-    private void prepareCollisionCheckCoordinates(@NonNull final GameCharacter gameCharacter)
+    @Override
+    public void prepareCollisionCheckCoordinates(@NonNull final GameCharacter gameCharacter)
     {
         final Rectangle characterCollisionArea = gameCharacter.getCollisionArea();
         if (characterCollisionArea != null)
@@ -154,7 +155,7 @@ public class RectangleCollisionDetector {
         return state;
     }
 
-    public boolean hasPlayerCollisionOnWorldTiles(@NonNull final GameCharacter gameCharacter)
+    public boolean hasCollisionOnWorldTiles(@NonNull final GameCharacter gameCharacter)
     {
         boolean collision = false;
         prepareCollisionCheckCoordinates(gameCharacter);
