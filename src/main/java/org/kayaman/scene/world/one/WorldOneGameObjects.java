@@ -25,11 +25,12 @@ public final class WorldOneGameObjects {
     private static void addDoorObjects(final int worldMapRowNum,
                                       final int worldMapColNum,
                                       final String resourcePathToImageName,
-                                      final String itemName,
+                                      @NonNull final String itemName,
+                                      @NonNull final String keyNameToUnlock,
                                       final int tileSize)
     {
         final BufferedImage image = SpriteLoader.getSprite(resourcePathToImageName);
-        final Door door = new Door(itemName, image);
+        final Door door = new Door(itemName, keyNameToUnlock, image);
         door.setCollisionArea(new Rectangle(0, 0, tileSize, tileSize));
         door.setPositionInWorldMapAndOnScreen(worldMapRowNum, worldMapColNum, tileSize);
         gameObjectInThisWorld.add(door);
@@ -49,9 +50,11 @@ public final class WorldOneGameObjects {
     }
 
     private static void addDoorsAndKeys(@NonNull final int tileSize) {
-        addDoorObjects(5, 3, DOORS_FOLDER + "blue_carpet_door_closed.png", "blueCarpetDoorClosed1", tileSize);
+        addDoorObjects(5, 3, DOORS_FOLDER + "blue_carpet_door_closed.png",
+                "blueCarpetDoorClosed1", "blueDoorKey1", tileSize);
         addDoorKeyObjects(4, 5, KEYS_FOLDER + "blue_key.png", "blueDoorKey1", tileSize);
-        addDoorObjects(5, 9, DOORS_FOLDER + "red_carpet_door_closed.png", "redCarpetDoorClosed1", tileSize);
+        addDoorObjects(5, 9, DOORS_FOLDER + "red_carpet_door_closed.png",
+                "redCarpetDoorClosed1", "redDoorKey1", tileSize);
         addDoorKeyObjects(11, 3, KEYS_FOLDER + "red_key.png", "redDoorKey1", tileSize);
 
     }

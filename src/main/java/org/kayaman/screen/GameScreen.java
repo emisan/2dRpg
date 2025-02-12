@@ -2,6 +2,8 @@ package org.kayaman.screen;
 
 import lombok.NonNull;
 import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
+import org.kayaman.engine.handler.inventory.ItemInventoryEntry;
+import org.kayaman.engine.handler.inventory.ItemInventoryWindow;
 import org.kayaman.entities.Player;
 import org.kayaman.engine.GameLoopEngine;
 import org.kayaman.engine.controls.GameScreenController;
@@ -15,6 +17,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,7 +45,10 @@ public class GameScreen extends JPanel implements Runnable {
     private transient Player player;
     private transient World world;
 
-    private final GameScreenController gameScreenController;
+    private ItemInventoryWindow itemInventoryWindow;
+    private final transient GameScreenController gameScreenController;
+
+    private transient Graphics2D graphics2D;
 
     public GameScreen(final int originalTileSize, final int scaleTile, final int maxScreenCols, final int maxScreenRows)
     {
@@ -68,6 +74,7 @@ public class GameScreen extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         initGameCharacters();
         initWorldMap();
+        initViews();
     }
 
     private void initGameCharacters() {
@@ -82,6 +89,10 @@ public class GameScreen extends JPanel implements Runnable {
         final int maxWorldWidth = gpTileSize * maxWorldColumns;
         final int maxWorldHeight = gpTileSize * world.getMaxWorldRows();
         initCollisionDetection(world, maxWorldWidth, maxWorldHeight);
+    }
+
+    private void initViews() {
+        itemInventoryWindow = new ItemInventoryWindow(this);
     }
 
     private void initCollisionDetection(@NonNull final World onWorld,
@@ -145,17 +156,25 @@ public class GameScreen extends JPanel implements Runnable {
     }
 
     public void update() {
+
         // needed to update maybe changed tileSize by zooming
         getWorld().setTileSize(gpTileSize);
         getPlayer().setTileSize(gpTileSize);
-        // update the characters always, so that changed states are updated, like tileSize or collision, etc.
-        getPlayer().update();
+
+        // update ItemInventoryWindow position, maybe if GameScreen has been moved
+        itemInventoryWindow.updateLocation(this);
+
+        // update player
+        if (graphics2D != null) {
+            // update the characters always, so that changed states are updated, like tileSize or collision, etc.
+            getPlayer().update(graphics2D);
+        }
     }
 
     @Override
     public void paintComponent(final Graphics g) {
         super.paintComponent(g);
-        Graphics2D graphics2D = (Graphics2D) g;
+        graphics2D = (Graphics2D) g;
         final long before = System.nanoTime();
         getWorld().drawMap(graphics2D);
         getPlayer().draw(graphics2D);
@@ -171,8 +190,15 @@ public class GameScreen extends JPanel implements Runnable {
             graphics2D.drawString("System measurements:", 10, 100);
             graphics2D.drawString("===================", 10, 110);
             graphics2D.drawString("drawing time: " + (after - before)/1000000000.0, 10, 125);
-//            LOGGER.log(Level.INFO, "drawing time: " + (after - before/1000000000.0));
         }
+    }
+
+    public void updateItemInventoryWindowWith(@NonNull final List<ItemInventoryEntry> inventory) {
+        this.itemInventoryWindow.initList(inventory);
+    }
+
+    public void showItemInventory(final boolean state) {
+        this.itemInventoryWindow.setVisible(state);
     }
 
     public Thread getThread() {

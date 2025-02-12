@@ -2,18 +2,19 @@ package org.kayaman.entities;
 
 import lombok.NonNull;
 import org.kayaman.engine.ImageProcessingPerformance;
-import org.kayaman.engine.handler.ItemInventoryHandler;
+import org.kayaman.engine.handler.inventory.ItemInventoryHandler;
 import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
 import org.kayaman.engine.handler.RectangleTileCollisionDetector;
 import org.kayaman.engine.controls.GameCharacterKeyboardController;
+import org.kayaman.engine.handler.inventory.ItemInventoryWindow;
 import org.kayaman.loader.SpriteLoader;
 import org.kayaman.screen.GameScreen;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Player implements GameCharacter, ImageProcessingPerformance {
@@ -49,6 +50,9 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     private ItemInventoryHandler itemInventoryHandler;
     private GameCharacterKeyboardController gameCharacterKeyboardController;
 
+    private GameScreen gameScreen;
+    private Graphics2D graphics2D;
+
     public Player(@NonNull GameScreen gameScreen)
     {
         setDefaults(gameScreen);
@@ -56,6 +60,7 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     }
 
     private void setDefaults(@NonNull GameScreen gameScreen) {
+        this.gameScreen = gameScreen;
         upCounter = -1;
         leftCounter = -1;
         rightCounter = -1;
@@ -221,11 +226,11 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
         }
     }
 
-    public void update() {
-        updateMovementAndCheckCollisions();
+    public void update(@NonNull final Graphics2D graphics2D) {
+        updateMovementAndCheckCollisions(graphics2D);
     }
 
-    private void updateMovementAndCheckCollisions() {
+    private void updateMovementAndCheckCollisions(@NonNull final Graphics2D graphics2D) {
         final boolean leftPressed = gameCharacterKeyboardController.getLeftPressed();
         final boolean rightPressed = gameCharacterKeyboardController.getRightPressed();
         final boolean upPressed = gameCharacterKeyboardController.getUpPressed();
@@ -233,7 +238,6 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
         final String direction = gameCharacterKeyboardController.getLastDirection();
 
         final boolean collision = playCollisionDetection.hasCollisionOnWorldTiles(this);
-//        final GameObject colliedWithGameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
 
         if (leftPressed && !collision) {
             updateLeftMovementImages();
@@ -256,11 +260,20 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
             setUpdateToFirstImageStandingStillRelatedToDirection(direction);
         }
 
-//        if (colliedWithGameObject != null) {
-//            LOGGER.log(Level.INFO, "Picking up " + colliedWithGameObject.getItemName() + " to itemInventoryHandler");
-//            itemInventoryHandler.addToInventory(colliedWithGameObject);
-//            gameObjectCollisionDetection.removeGameObject(colliedWithGameObject);
-//        }
+        if (!collision) {
+            checkGameObjectCollision(graphics2D);
+        }
+    }
+
+    private void checkGameObjectCollision(@NonNull final Graphics2D graphics2D) {
+        final GameObject gameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
+        if (gameObject != null) {
+            graphics2D.setFont(new Font("Times New Roman", Font.PLAIN, 14));
+            graphics2D.drawString("Picked up " + gameObject.getItemName(), 10, 100);
+            itemInventoryHandler.addToInventory(gameObject);
+            gameScreen.updateItemInventoryWindowWith(itemInventoryHandler.getInventory());
+            gameObjectCollisionDetection.removeGameObject(gameObject);
+        }
     }
 
     private void drawCollisionArea(@NonNull final Graphics2D g) {

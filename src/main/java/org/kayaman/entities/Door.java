@@ -14,13 +14,16 @@ public class Door implements GameObject {
     private int worldXPos;
     private int worldYPos;
     private final String itemName;
+    private final String keyNameToUnlock;
     private Rectangle collisionArea;
     private final BufferedImage image;
 
     public Door(@NonNull final String itemName,
+                @NonNull final String keyNameToUnlock,
                 @NonNull final BufferedImage image)
     {
         this.itemName = itemName;
+        this.keyNameToUnlock = keyNameToUnlock;
         this.image = image;
     }
 
@@ -32,7 +35,6 @@ public class Door implements GameObject {
         // we need to subtract by one to get starting index to draw on screen
         worldXPos = (mapColNum-1) * tileSize;
         worldYPos = (mapRowNum-1) * tileSize;
-        //LOGGER.log(Level.INFO, () -> "Door at worldX " + worldXPos + ", worldY " + worldYPos);
     }
 
     @Override
@@ -53,6 +55,11 @@ public class Door implements GameObject {
     @Override
     public BufferedImage getImage() {
         return image;
+    }
+
+    @NonNull
+    public String getKeyNameToUnlock() {
+        return keyNameToUnlock;
     }
 
     @Override
