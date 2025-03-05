@@ -54,7 +54,7 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
         if (keyEventCode == KeyEvent.VK_I) {
             showItemInventory = !showItemInventory;
         }
-        this.gameScreen.showItemInventory(showItemInventory);
+        this.gameScreen.openOrCloseInventory(showItemInventory);
     }
 
     @Override

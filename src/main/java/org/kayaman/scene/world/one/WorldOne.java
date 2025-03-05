@@ -1,6 +1,7 @@
 package org.kayaman.scene.world.one;
 
 import lombok.NonNull;
+import org.kayaman.engine.GameEngine;
 import org.kayaman.entities.GameCharacter;
 import org.kayaman.entities.GameObject;
 import org.kayaman.loader.SpriteLoader;
@@ -76,16 +77,6 @@ public class WorldOne implements World {
     }
 
     @Override
-    public void drawFasterByScalingImage(@NonNull final Graphics2D g2,
-                                         @NonNull final BufferedImage image,
-                                         final int byScale,
-                                         final int screenXPos,
-                                         final int screenYPos)
-    {
-        g2.drawImage(SpriteLoader.getScaledImage(image, byScale), screenXPos, screenYPos, null);
-    }
-
-    @Override
     public void drawMap(@NonNull final Graphics2D g2)
     {
         final int playerPosXOnWorldMap = (int)player.getXPosOnWorld();
@@ -138,7 +129,7 @@ public class WorldOne implements World {
                 final int worldYPos = obj.getWorldYPos();
                 final int onScreenX = worldXPos - playerWorldXPos + playerScreenXPos;
                 final int onScreenY = worldYPos - playerWorldYPos + playerScreenYPos;
-                drawFasterByScalingImage(g2, obj.getImage(), tileSize, onScreenX, onScreenY);
+                GameEngine.drawFasterByScalingImage(g2, obj.getImage(), tileSize, onScreenX, onScreenY);
             }
         }
     }

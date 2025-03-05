@@ -1,13 +1,12 @@
 package org.kayaman.scene;
 
 import lombok.NonNull;
-import org.kayaman.engine.ImageProcessingPerformance;
 import org.kayaman.entities.GameObject;
 
 import java.awt.Graphics2D;
 import java.util.List;
 
-public interface World extends ImageProcessingPerformance {
+public interface World {
 
     void setTileSize(final int tileSize);
     void drawMap(@NonNull final Graphics2D g2);

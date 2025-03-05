@@ -30,13 +30,9 @@ public class ItemInventoryHandler {
 
     @CheckForNull
     public ItemInventoryEntry getGameObjectsBy(@NonNull final String objectName) {
-        final ItemInventoryEntry entry =
-                inventory.stream().filter(obj -> objectName.equalsIgnoreCase(obj.getItemName())).findFirst()
-                        .orElse(null);
-        if (entry != null) {
-            return entry;
-        }
-        return null;
+        return inventory.stream().filter(obj -> objectName.equalsIgnoreCase(obj.getItemName()))
+                .findFirst()
+                .orElse(null);
     }
 
     public List<ItemInventoryEntry> getInventory() {

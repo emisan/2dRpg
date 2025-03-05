@@ -1,12 +1,10 @@
 package org.kayaman.entities;
 
 import lombok.NonNull;
-import org.kayaman.engine.ImageProcessingPerformance;
-import org.kayaman.engine.handler.inventory.ItemInventoryHandler;
+import org.kayaman.engine.GameEngine;
 import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
 import org.kayaman.engine.handler.RectangleTileCollisionDetector;
 import org.kayaman.engine.controls.GameCharacterKeyboardController;
-import org.kayaman.engine.handler.inventory.ItemInventoryWindow;
 import org.kayaman.loader.SpriteLoader;
 import org.kayaman.screen.GameScreen;
 
@@ -17,7 +15,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
-public class Player implements GameCharacter, ImageProcessingPerformance {
+public class Player implements GameCharacter {
 
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
 
@@ -47,20 +45,21 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     private RectangleTileCollisionDetector playCollisionDetection;
     private RectangleGameObjectCollisionDetection gameObjectCollisionDetection;
 
-    private ItemInventoryHandler itemInventoryHandler;
     private GameCharacterKeyboardController gameCharacterKeyboardController;
 
-    private GameScreen gameScreen;
-    private Graphics2D graphics2D;
+    private final GameScreen gameScreen;
+
+    private final Font font;
 
     public Player(@NonNull GameScreen gameScreen)
     {
-        setDefaults(gameScreen);
+        font = new Font("Arial", Font.PLAIN, 14);
+        this.gameScreen = gameScreen;
+        setDefaults();
         initMovementImages();
     }
 
-    private void setDefaults(@NonNull GameScreen gameScreen) {
-        this.gameScreen = gameScreen;
+    private void setDefaults() {
         upCounter = -1;
         leftCounter = -1;
         rightCounter = -1;
@@ -78,7 +77,6 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
         movementSpeed = 4;
         collisionArea = new Rectangle(tileSize/4, tileSize/2, tileSize/2, tileSize/2);
         gameCharacterKeyboardController = new GameCharacterKeyboardController();
-        itemInventoryHandler = new ItemInventoryHandler();
     }
 
     private void initMovementImages() {
@@ -268,10 +266,10 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     private void checkGameObjectCollision(@NonNull final Graphics2D graphics2D) {
         final GameObject gameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
         if (gameObject != null) {
-            graphics2D.setFont(new Font("Times New Roman", Font.PLAIN, 14));
-            graphics2D.drawString("Picked up " + gameObject.getItemName(), 10, 100);
-            itemInventoryHandler.addToInventory(gameObject);
-            gameScreen.updateItemInventoryWindowWith(itemInventoryHandler.getInventory());
+            graphics2D.setFont(font);
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString("Picked up " + gameObject.getItemName(), 20, 100);
+            gameScreen.updateItemInventoryWindowWith(gameObject);
             gameObjectCollisionDetection.removeGameObject(gameObject);
         }
     }
@@ -286,18 +284,9 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
 
     @Override
     public void draw(@NonNull final Graphics2D graphics2d) {
-        drawFasterByScalingImage(graphics2d, getActualImage(), getTileSize(), getXPosOnScreen(), getYPosOnScreen());
+        GameEngine.drawFasterByScalingImage(
+                graphics2d, getActualImage(), getTileSize(), getXPosOnScreen(), getYPosOnScreen());
 //        drawCollisionArea(g2);
-    }
-
-    @Override
-    public void drawFasterByScalingImage(@NonNull final Graphics2D g2,
-                                         @NonNull final  BufferedImage image,
-                                         final int byScale,
-                                         final int screenXPos,
-                                         final int screenYPos)
-    {
-        g2.drawImage(SpriteLoader.getScaledImage(getActualImage(), getTileSize()), screenXPos, screenYPos, null);
     }
 
     @Override

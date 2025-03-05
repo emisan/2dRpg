@@ -51,12 +51,12 @@ public final class WorldOneGameObjects {
 
     private static void addDoorsAndKeys(@NonNull final int tileSize) {
         addDoorObjects(5, 3, DOORS_FOLDER + "blue_carpet_door_closed.png",
-                "blueCarpetDoorClosed1", "blueDoorKey1", tileSize);
-        addDoorKeyObjects(4, 5, KEYS_FOLDER + "blue_key.png", "blueDoorKey1", tileSize);
+                "blueCarpetDoorClosed1", "blueDoorKey", tileSize);
+        addDoorKeyObjects(4, 5, KEYS_FOLDER + "blue_key.png", "blueDoorKey", tileSize);
         addDoorObjects(5, 9, DOORS_FOLDER + "red_carpet_door_closed.png",
-                "redCarpetDoorClosed1", "redDoorKey1", tileSize);
-        addDoorKeyObjects(11, 3, KEYS_FOLDER + "red_key.png", "redDoorKey1", tileSize);
-
+                "redCarpetDoorClosed1", "redDoorKey", tileSize);
+        addDoorKeyObjects(11, 3, KEYS_FOLDER + "red_key.png", "redDoorKey", tileSize);
+        addDoorKeyObjects(13, 5, KEYS_FOLDER + "red_key.png", "redDoorKey", tileSize);
     }
 
     public static List<GameObject> getGameObjects(@NonNull final int tileSizeInWorld) {

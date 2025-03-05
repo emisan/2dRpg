@@ -2,10 +2,10 @@ package org.kayaman.screen;
 
 import lombok.NonNull;
 import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
-import org.kayaman.engine.handler.inventory.ItemInventoryEntry;
 import org.kayaman.engine.handler.inventory.ItemInventoryWindow;
+import org.kayaman.entities.GameObject;
 import org.kayaman.entities.Player;
-import org.kayaman.engine.GameLoopEngine;
+import org.kayaman.engine.GameEngine;
 import org.kayaman.engine.controls.GameScreenController;
 import org.kayaman.engine.handler.RectangleTileCollisionDetector;
 import org.kayaman.loader.WorldMapLoader;
@@ -17,7 +17,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.List;
+import java.awt.Point;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -92,7 +92,7 @@ public class GameScreen extends JPanel implements Runnable {
     }
 
     private void initViews() {
-        itemInventoryWindow = new ItemInventoryWindow(this);
+        itemInventoryWindow = new ItemInventoryWindow();
     }
 
     private void initCollisionDetection(@NonNull final World onWorld,
@@ -127,7 +127,7 @@ public class GameScreen extends JPanel implements Runnable {
 
     public void startGameThread() {
         gameThread = new Thread(this);
-        GameLoopEngine.setGameScreen(this);
+        GameEngine.setGameScreen(this);
         gameThread.start();
     }
 
@@ -161,11 +161,14 @@ public class GameScreen extends JPanel implements Runnable {
         getWorld().setTileSize(gpTileSize);
         getPlayer().setTileSize(gpTileSize);
 
-        // update ItemInventoryWindow position, maybe if GameScreen has been moved
-        itemInventoryWindow.updateLocation(this);
 
-        // update player
+        // update after graphics are drawn
         if (graphics2D != null) {
+            // update ItemInventoryWindow position, related where GameScreen is position on screen
+            // even when screen is moved by mouse to another screen position
+            final Point locationOnScreen = getLocationOnScreen();
+            itemInventoryWindow.updateLocation(
+                    locationOnScreen.x + (getWidth() - itemInventoryWindow.getWidth()), locationOnScreen.y);
             // update the characters always, so that changed states are updated, like tileSize or collision, etc.
             getPlayer().update(graphics2D);
         }
@@ -193,12 +196,12 @@ public class GameScreen extends JPanel implements Runnable {
         }
     }
 
-    public void updateItemInventoryWindowWith(@NonNull final List<ItemInventoryEntry> inventory) {
-        this.itemInventoryWindow.initList(inventory);
+    public void updateItemInventoryWindowWith(@NonNull final GameObject gameObject) {
+        this.itemInventoryWindow.updateListModelWith(gameObject);
     }
 
-    public void showItemInventory(final boolean state) {
-        this.itemInventoryWindow.setVisible(state);
+    public void openOrCloseInventory(final boolean state) {
+        this.itemInventoryWindow.openOrCloseInventory(state);
     }
 
     public Thread getThread() {
@@ -229,6 +232,10 @@ public class GameScreen extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        GameLoopEngine.deltaAccumulaterGameLoop();
+        GameEngine.deltaAccumulaterGameLoop();
+    }
+
+    public Graphics getGraphics2d() {
+        return graphics2D;
     }
 }
