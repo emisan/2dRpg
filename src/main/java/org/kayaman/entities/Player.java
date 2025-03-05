@@ -266,6 +266,7 @@ public class Player implements GameCharacter {
     private void checkGameObjectCollision(@NonNull final Graphics2D graphics2D) {
         final GameObject gameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
         if (gameObject != null) {
+            gameScreen.getSoundFxLoader().playMusic("Pickup.mp3", false);
             graphics2D.setFont(font);
             graphics2D.setColor(Color.WHITE);
             graphics2D.drawString("Picked up " + gameObject.getItemName(), 20, 100);

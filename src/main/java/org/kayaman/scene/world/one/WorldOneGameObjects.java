@@ -49,7 +49,7 @@ public final class WorldOneGameObjects {
         gameObjectInThisWorld.add(key);
     }
 
-    private static void addDoorsAndKeys(@NonNull final int tileSize) {
+    private static void addDoorsAndKeys(final int tileSize) {
         addDoorObjects(5, 3, DOORS_FOLDER + "blue_carpet_door_closed.png",
                 "blueCarpetDoorClosed1", "blueDoorKey", tileSize);
         addDoorKeyObjects(4, 5, KEYS_FOLDER + "blue_key.png", "blueDoorKey", tileSize);
@@ -59,7 +59,7 @@ public final class WorldOneGameObjects {
         addDoorKeyObjects(13, 5, KEYS_FOLDER + "red_key.png", "redDoorKey", tileSize);
     }
 
-    public static List<GameObject> getGameObjects(@NonNull final int tileSizeInWorld) {
+    public static List<GameObject> getGameObjects(final int tileSizeInWorld) {
         if (gameObjectInThisWorld == null) {
             gameObjectInThisWorld = new ArrayList<>();
             addDoorsAndKeys(tileSizeInWorld);
