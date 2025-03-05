@@ -8,6 +8,7 @@ import org.kayaman.entities.Player;
 import org.kayaman.engine.GameEngine;
 import org.kayaman.engine.controls.GameScreenController;
 import org.kayaman.engine.handler.RectangleTileCollisionDetector;
+import org.kayaman.loader.SoundLoader;
 import org.kayaman.loader.WorldMapLoader;
 import org.kayaman.scene.World;
 import org.kayaman.scene.world.one.WorldOneGameObjects;
@@ -41,6 +42,8 @@ public class GameScreen extends JPanel implements Runnable {
 
     private double zoomFactor;
 
+    private final transient SoundLoader bgMusicLoader;
+    private final transient SoundLoader soundFxLoader;
     private transient Thread gameThread;
     private transient Player player;
     private transient World world;
@@ -58,6 +61,9 @@ public class GameScreen extends JPanel implements Runnable {
         this.addMouseWheelListener(gameScreenController);
         setupGameField(originalTileSize, scaleTile , maxScreenCols, maxScreenRows);
         startGameThread();
+        bgMusicLoader = new SoundLoader();
+        soundFxLoader = new SoundLoader();
+        bgMusicLoader.playMusic("OnTheRoadAgain2.mp3", true);
     }
 
     private void setupGameField(int originalTileSize, int scale, int maxScreenCols, int maxScreenRows) {
@@ -228,6 +234,14 @@ public class GameScreen extends JPanel implements Runnable {
     @Override
     public int getHeight() {
         return screenHeight;
+    }
+
+    public SoundLoader getSoundFxLoader() {
+        return soundFxLoader;
+    }
+
+    public SoundLoader getBackgroundMusicLoader() {
+        return bgMusicLoader;
     }
 
     @Override
