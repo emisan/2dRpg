@@ -1,4 +1,4 @@
-package org.kayaman.controls;
+package org.kayaman.engine.controls;
 
 import lombok.NonNull;
 import org.kayaman.screen.GameScreen;
@@ -15,6 +15,7 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
     private int mouseScrollSpeed;
     private final GameScreen gameScreen;
     private boolean showDrawingTime;
+    private boolean showItemInventory;
 
     public GameScreenController(@NonNull final GameScreen gameScreen) {
         this.gameScreen = gameScreen;
@@ -23,22 +24,16 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
     public void setMouseScrollSpeed(final int mouseScrollSpeed) {
         this.mouseScrollSpeed = mouseScrollSpeed;
     }
-    @Override
-    public void keyTyped(KeyEvent e) {
-        // actually nothing
-    }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-        if (code == KeyEvent.VK_Q) {
+    private void handleZoom(final int keyEventCode) {
+        if (keyEventCode == KeyEvent.VK_Q) {
             // nice effect: when keyPressed hold this will zoom tileSize using images zoom-in endlessly, can be used to
             // make player jump like rick dangerous when hit or to raise the player up in the sky or down:)
             //
             // if zoomInOut-method of game screen is part of gameScreen-updateMovement only one time pressing is needed
             gameScreen.zoomInOut(1);
         }
-        else if (code == KeyEvent.VK_E) {
+        else if (keyEventCode == KeyEvent.VK_E) {
             // nice effect: if only placed in keyPressed this will zoom out endlessly when keyPressed hold
             // make player jump like rick dangerous when hit or to raise the player up in the sky or down:)
             // also: if player is zoomed out so far that it is reaching tileSize = 0 and moving negative
@@ -47,14 +42,32 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
             //  if zoomInOut-method of game screen is part of gameScreen-updateMovement only one time pressing is needed
             gameScreen.zoomInOut(-1);
         }
-        else if (code == KeyEvent.VK_T) {
-            if (!showDrawingTime) {
-                showDrawingTime = true;
-            }
-            else {
-                showDrawingTime = false;
-            }
+    }
+
+    private void handleShowDrawingTime(final int keyEventCode) {
+        if (keyEventCode == KeyEvent.VK_T) {
+            showDrawingTime = !showDrawingTime;
         }
+    }
+
+    private void handleItemInventoryWindow(final int keyEventCode) {
+        if (keyEventCode == KeyEvent.VK_I) {
+            showItemInventory = !showItemInventory;
+        }
+        this.gameScreen.openOrCloseInventory(showItemInventory);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // actually nothing
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int code = e.getKeyCode();
+        handleZoom(code);
+        handleShowDrawingTime(code);
+        handleItemInventoryWindow(code);
     }
 
     @Override

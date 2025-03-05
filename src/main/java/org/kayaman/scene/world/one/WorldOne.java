@@ -1,6 +1,7 @@
 package org.kayaman.scene.world.one;
 
 import lombok.NonNull;
+import org.kayaman.engine.GameEngine;
 import org.kayaman.entities.GameCharacter;
 import org.kayaman.entities.GameObject;
 import org.kayaman.loader.SpriteLoader;
@@ -25,7 +26,7 @@ public class WorldOne implements World {
 
     private final GameCharacter player;
 
-    private List<GameObject> worldObjects;
+    private List<GameObject> worldGameObjects;
     private final Tile[][] worldMap;
 
     public WorldOne(@NonNull final GameScreen gameScreen)
@@ -38,7 +39,6 @@ public class WorldOne implements World {
         maxWorldColumns = worldMapTileManager.getWorldMapMaxColumns();
         maxWorldRows = worldMapTileManager.getWorldMapMaxColumns();
         worldMap = worldMapTileManager.getTileMap();
-        worldObjects = WorldOneGameObjects.getGameObjects(gameScreen);
     }
 
     @Override
@@ -47,8 +47,13 @@ public class WorldOne implements World {
     }
 
     @Override
-    public void setupWorldGameObjects(@NonNull final GameScreen gameScreen) {
-        worldObjects = WorldOneGameObjects.getGameObjects(gameScreen);
+    public void setWorldGameObjects(@NonNull final List<GameObject> gameObjects) {
+        worldGameObjects = gameObjects;
+    }
+
+    @Override
+    public List<GameObject> getWorldGameObjects() {
+        return worldGameObjects;
     }
 
     @Override
@@ -69,16 +74,6 @@ public class WorldOne implements World {
     @Override
     public void setTileSize(final int tileSize) {
         this.tileSize = tileSize;
-    }
-
-    @Override
-    public void drawFasterByScalingImage(@NonNull final Graphics2D g2,
-                                         @NonNull final BufferedImage image,
-                                         final int byScale,
-                                         final int screenXPos,
-                                         final int screenYPos)
-    {
-        // not on world tiles, but on world objects!
     }
 
     @Override
@@ -104,6 +99,8 @@ public class WorldOne implements World {
                             worldYMapPos + tileSize > playerPosYOnWorldMap - playerPosYOnScreen &&
                             worldYMapPos - tileSize < playerPosYOnWorldMap + playerPosYOnScreen)
                     {
+                        // drawFasterByScalingImage does not make impact on performance on world tiles
+                        // so we don't use it for world tiles
                         g2.drawImage(
                                 worldMap[row][col].getTileImage(), screenPosX, screenPosY, tileSize, tileSize, null);
                     }
@@ -115,6 +112,7 @@ public class WorldOne implements World {
 
             g2.drawImage(error, 0, 0, null);
         }
+        // use of drawFasterByScalingImage in this method makes a slight difference
         drawObjects(g2, playerPosXOnWorldMap, playerPosYOnWorldMap, playerPosXOnScreen, playerPosYOnScreen, tileSize);
     }
 
@@ -125,14 +123,13 @@ public class WorldOne implements World {
                             final int playerScreenXPos,
                             final int playerScreenYPos,
                             final int tileSize) {
-        final List<GameObject> objects = worldObjects;
-        if (worldObjects != null) {
-            for (final GameObject obj : objects) {
+        if (worldGameObjects != null) {
+            for (final GameObject obj : worldGameObjects) {
                 final int worldXPos = obj.getWorldXPos();
                 final int worldYPos = obj.getWorldYPos();
                 final int onScreenX = worldXPos - playerWorldXPos + playerScreenXPos;
                 final int onScreenY = worldYPos - playerWorldYPos + playerScreenYPos;
-                drawFasterByScalingImage(g2, obj.getImage(), tileSize, onScreenX, onScreenY);
+                GameEngine.drawFasterByScalingImage(g2, obj.getImage(), tileSize, onScreenX, onScreenY);
             }
         }
     }

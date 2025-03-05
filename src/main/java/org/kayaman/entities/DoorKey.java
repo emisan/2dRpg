@@ -2,6 +2,7 @@ package org.kayaman.entities;
 
 import lombok.NonNull;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,6 +15,7 @@ public class DoorKey implements GameObject {
     private int worldYPos;
     private final String itemName;
     private final BufferedImage image;
+    private Rectangle collisionArea;
 
     public DoorKey(@NonNull final String itemName,
                    @NonNull final BufferedImage image)
@@ -30,7 +32,6 @@ public class DoorKey implements GameObject {
         // we need to subtract by one to get starting index to draw on screen
         worldXPos = (mapColNum-1) * tileSize;
         worldYPos = (mapRowNum-1) * tileSize;
-        //LOGGER.log(Level.INFO, () -> "Door at worldX " + worldXPos + ", worldY " + worldYPos);
     }
 
     @Override
@@ -51,5 +52,15 @@ public class DoorKey implements GameObject {
     @Override
     public BufferedImage getImage() {
         return image;
+    }
+
+    @Override
+    public void setCollisionArea(@NonNull final Rectangle collisionArea) {
+        this.collisionArea = collisionArea;
+    }
+
+    @Override
+    public Rectangle getCollisionArea() {
+        return collisionArea;
     }
 }

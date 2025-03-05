@@ -1,23 +1,36 @@
 package org.kayaman.engine;
 
+import lombok.NonNull;
+import org.kayaman.loader.SpriteLoader;
 import org.kayaman.screen.GameScreen;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
-public final class GameLoopEngine {
+public final class GameEngine {
 
-    private static final Logger LOGGER = Logger.getLogger(GameLoopEngine.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GameEngine.class.getName());
 
     private static final int FRAMES_PER_SECOND = 60;
     private static final double ONE_BILLION_NANOSECEONDS = 1000000000.0;
     private static final double DRAW_INTERVAL = ONE_BILLION_NANOSECEONDS/FRAMES_PER_SECOND;
     private static GameScreen gameScreen;
 
-    private GameLoopEngine() {
+    private GameEngine() {
     }
 
     public static void setGameScreen(final GameScreen parent) {
         gameScreen = parent;
+    }
+
+    public static void drawFasterByScalingImage(@NonNull final Graphics2D g2,
+                                         @NonNull final BufferedImage image,
+                                         final int byScale,
+                                         final int screenXPos,
+                                         final int screenYPos)
+    {
+        g2.drawImage(SpriteLoader.getScaledImage(image, byScale), screenXPos, screenYPos, null);
     }
 
     public static void deltaAccumulaterGameLoop() {

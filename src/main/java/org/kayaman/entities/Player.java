@@ -1,19 +1,21 @@
 package org.kayaman.entities;
 
 import lombok.NonNull;
-import org.kayaman.engine.ImageProcessingPerformance;
-import org.kayaman.engine.RectangleCollisionDetector;
-import org.kayaman.controls.GameCharacterKeyboardController;
+import org.kayaman.engine.GameEngine;
+import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
+import org.kayaman.engine.handler.RectangleTileCollisionDetector;
+import org.kayaman.engine.controls.GameCharacterKeyboardController;
 import org.kayaman.loader.SpriteLoader;
 import org.kayaman.screen.GameScreen;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
-public class Player implements GameCharacter, ImageProcessingPerformance {
+public class Player implements GameCharacter {
 
     private static final Logger LOGGER = Logger.getLogger(Player.class.getName());
 
@@ -40,14 +42,30 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     private int imageUpdateSpeed;
 
     private Rectangle collisionArea;
+    private RectangleTileCollisionDetector playCollisionDetection;
+    private RectangleGameObjectCollisionDetection gameObjectCollisionDetection;
 
-    private RectangleCollisionDetector playCollisionDetection;
     private GameCharacterKeyboardController gameCharacterKeyboardController;
+
+    private final GameScreen gameScreen;
+
+    private final Font font;
 
     public Player(@NonNull GameScreen gameScreen)
     {
+        font = new Font("Arial", Font.PLAIN, 14);
+        this.gameScreen = gameScreen;
         setDefaults();
-        gameCharacterKeyboardController = new GameCharacterKeyboardController();
+        initMovementImages();
+    }
+
+    private void setDefaults() {
+        upCounter = -1;
+        leftCounter = -1;
+        rightCounter = -1;
+        downCounter = -1;
+        imageUpdateSpeed = 12;
+        imageUpdateCounter = 0;
         tileSize = gameScreen.getTileSize();
         // where player starts on world x-index and y-index world map array coordinates multiplied by tileSize
         // this affects moving through the world x-y- index coordinates
@@ -58,17 +76,7 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
         yPosOnScreen = gameScreen.getHeight()/2 - tileSize/2;
         movementSpeed = 4;
         collisionArea = new Rectangle(tileSize/4, tileSize/2, tileSize/2, tileSize/2);
-        initMovementImages();
-        this.actualImage = getDownMovements()[0]; // default stand still, look forward
-    }
-
-    private void setDefaults() {
-        upCounter = -1;
-        leftCounter = -1;
-        rightCounter = -1;
-        downCounter = -1;
-        imageUpdateSpeed = 12;
-        imageUpdateCounter = 0;
+        gameCharacterKeyboardController = new GameCharacterKeyboardController();
     }
 
     private void initMovementImages() {
@@ -97,6 +105,7 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
                 SpriteLoader.getSprite(resourceFolder + "PlayerMain_e_2.png"),
                 SpriteLoader.getSprite(resourceFolder + "PlayerMain_e_3.png")
                 };
+        this.actualImage = getDownMovements()[0]; // default stand still, look forward
     }
 
     private void setActualImage(@NonNull final BufferedImage actualImage) {
@@ -215,24 +224,19 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
         }
     }
 
-    public void update() {
-        updateMovement();
+    public void update(@NonNull final Graphics2D graphics2D) {
+        updateMovementAndCheckCollisions(graphics2D);
     }
 
-    private void updateMovement() {
+    private void updateMovementAndCheckCollisions(@NonNull final Graphics2D graphics2D) {
         final boolean leftPressed = gameCharacterKeyboardController.getLeftPressed();
         final boolean rightPressed = gameCharacterKeyboardController.getRightPressed();
         final boolean upPressed = gameCharacterKeyboardController.getUpPressed();
         final boolean downPressed = gameCharacterKeyboardController.getDownPressed();
         final String direction = gameCharacterKeyboardController.getLastDirection();
 
-        final boolean collision = playCollisionDetection.hasPlayerCollisionOnWorldTiles(this);
+        final boolean collision = playCollisionDetection.hasCollisionOnWorldTiles(this);
 
-//        if (!leftPressed && !rightPressed && !downPressed && !upPressed)
-//        {
-//            gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.STAND_STILL);
-//            setUpdateToFirstImageStandingStillRelatedToDirection(direction);
-//        }
         if (leftPressed && !collision) {
             updateLeftMovementImages();
             gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.LAST_DIRECTION_LEFT);
@@ -253,6 +257,21 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
             gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.STAND_STILL);
             setUpdateToFirstImageStandingStillRelatedToDirection(direction);
         }
+
+        if (!collision) {
+            checkGameObjectCollision(graphics2D);
+        }
+    }
+
+    private void checkGameObjectCollision(@NonNull final Graphics2D graphics2D) {
+        final GameObject gameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
+        if (gameObject != null) {
+            graphics2D.setFont(font);
+            graphics2D.setColor(Color.WHITE);
+            graphics2D.drawString("Picked up " + gameObject.getItemName(), 20, 100);
+            gameScreen.updateItemInventoryWindowWith(gameObject);
+            gameObjectCollisionDetection.removeGameObject(gameObject);
+        }
     }
 
     private void drawCollisionArea(@NonNull final Graphics2D g) {
@@ -265,18 +284,9 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
 
     @Override
     public void draw(@NonNull final Graphics2D graphics2d) {
-        drawFasterByScalingImage(graphics2d, getActualImage(), getTileSize(), getXPosOnScreen(), getYPosOnScreen());
+        GameEngine.drawFasterByScalingImage(
+                graphics2d, getActualImage(), getTileSize(), getXPosOnScreen(), getYPosOnScreen());
 //        drawCollisionArea(g2);
-    }
-
-    @Override
-    public void drawFasterByScalingImage(@NonNull final Graphics2D g2,
-                                         @NonNull final  BufferedImage image,
-                                         final int byScale,
-                                         final int screenXPos,
-                                         final int screenYPos)
-    {
-        g2.drawImage(SpriteLoader.getScaledImage(getActualImage(), getTileSize()), screenXPos, screenYPos, null);
     }
 
     @Override
@@ -362,12 +372,23 @@ public class Player implements GameCharacter, ImageProcessingPerformance {
     }
 
     @Override
-    public void setCollisionDetector(@NonNull final RectangleCollisionDetector collisionDetector) {
-        this.playCollisionDetection = collisionDetector;
+    public void setCollisionDetector(@NonNull final RectangleTileCollisionDetector collisionDetector) {
+        playCollisionDetection = collisionDetector;
     }
 
     @Override
-    public RectangleCollisionDetector getCollisionDetector() {
+    public RectangleTileCollisionDetector getCollisionDetector() {
         return this.playCollisionDetection;
+    }
+
+    @Override
+    public void setGameObjectsCollisionDetector(@NonNull final RectangleGameObjectCollisionDetection collisionDetector)
+    {
+        gameObjectCollisionDetection = collisionDetector;
+    }
+
+    @Override
+    public RectangleGameObjectCollisionDetection getGameObjectsCollisionDetector() {
+        return gameObjectCollisionDetection;
     }
 }
