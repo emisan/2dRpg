@@ -102,6 +102,7 @@ public class GameScreenController implements KeyListener, MouseListener, MouseWh
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
+        // see also comments in handelZoom(int)
         int zoom = e.getWheelRotation();
         if (zoom < 0) {
             // mouse wheel up, zoom in
