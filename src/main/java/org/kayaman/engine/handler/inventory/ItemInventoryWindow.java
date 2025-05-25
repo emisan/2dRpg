@@ -52,9 +52,22 @@ public class ItemInventoryWindow extends JWindow {
         return model;
     }
 
-    public void updateListModelWith(@NonNull final GameObject gameObject) {
-        itemInventoryHandler.addToInventory(gameObject);
+    private void updateInventory() {
         model = updateListModelWithInventory(itemInventoryHandler.getInventory());
         inventoryListComponent.setModel(model);
+    }
+
+    public void addToListModel(@NonNull final GameObject gameObject) {
+        itemInventoryHandler.addToInventory(gameObject);
+        updateInventory();
+    }
+
+    public void removeFromListModel(@NonNull final ItemInventoryEntry entry) {
+        itemInventoryHandler.removeFromInventoryOrDecrementAmount(entry);
+        updateInventory();
+    }
+
+    public ItemInventoryHandler getItemInventoryHandler() {
+        return itemInventoryHandler;
     }
 }

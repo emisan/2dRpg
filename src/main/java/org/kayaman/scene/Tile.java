@@ -10,7 +10,7 @@ public class Tile {
     private int widthOnScreen;
     private int heightOnScreen;
 
-    private int tileNumberOnWorldMap;
+    private final int tileNumberOnWorldMap;
     private final BufferedImage tileImage;
 
     /**
@@ -56,5 +56,9 @@ public class Tile {
 
     public void setHeightOnScreen(int heightOnScreen) {
         this.heightOnScreen = heightOnScreen;
+    }
+
+    public int getTileNumber() {
+        return tileNumberOnWorldMap;
     }
 }

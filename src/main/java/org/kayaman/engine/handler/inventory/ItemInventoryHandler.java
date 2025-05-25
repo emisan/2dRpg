@@ -3,7 +3,6 @@ package org.kayaman.engine.handler.inventory;
 import lombok.NonNull;
 import org.kayaman.entities.GameObject;
 
-import javax.annotation.CheckForNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,11 +27,21 @@ public class ItemInventoryHandler {
         }
     }
 
-    @CheckForNull
-    public ItemInventoryEntry getGameObjectsBy(@NonNull final String objectName) {
-        return inventory.stream().filter(obj -> objectName.equalsIgnoreCase(obj.getItemName()))
-                .findFirst()
-                .orElse(null);
+    public void removeFromInventoryOrDecrementAmount(@NonNull final ItemInventoryEntry entry) {
+        if (entry.getAmount() > 1) {
+            for (final ItemInventoryEntry e : this.inventory)
+            {
+                if (e.getItemName().equals(entry.getItemName()))
+                {
+                    final int amount = e.getAmount() - 1;
+                    e.setAmount(amount);
+                    break;
+                }
+            }
+        }
+        else {
+            inventory.remove(entry);
+        }
     }
 
     public List<ItemInventoryEntry> getInventory() {

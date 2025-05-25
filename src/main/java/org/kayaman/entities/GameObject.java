@@ -16,4 +16,5 @@ public interface GameObject {
     BufferedImage getImage();
     void setCollisionArea(@NonNull final Rectangle collisionArea);
     Rectangle getCollisionArea();
+    boolean isCollectible();
 }

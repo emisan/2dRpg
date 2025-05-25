@@ -33,12 +33,14 @@ public class WorldOne implements World {
     {
         player = gameScreen.getPlayer();
         tileSize = gameScreen.getTileSize();
+
         // prepare mapping of world map, also how large the map is in max columns and rows
         final WorldMapTileManager worldMapTileManager = new WorldMapTileManager("/maps/world_1.txt");
         worldMapTileManager.setMapTiles(WorldOneTiles.getTilesOfThisWorld(tileSize));
         maxWorldColumns = worldMapTileManager.getWorldMapMaxColumns();
         maxWorldRows = worldMapTileManager.getWorldMapMaxColumns();
         worldMap = worldMapTileManager.getTileMap();
+        setWorldGameObjects(WorldOneGameObjects.getGameObjects(tileSize));
     }
 
     @Override
@@ -94,10 +96,10 @@ public class WorldOne implements World {
                     final int screenPosY = worldYMapPos - playerPosYOnWorldMap + playerPosYOnScreen;
 
                     // world tile images boundary to draw only the tiles we need to see on screen while moving the player
-                    if (worldXMapPos + tileSize > playerPosXOnWorldMap - playerPosXOnScreen &&
-                            worldXMapPos - tileSize < playerPosXOnWorldMap + playerPosXOnScreen &&
-                            worldYMapPos + tileSize > playerPosYOnWorldMap - playerPosYOnScreen &&
-                            worldYMapPos - tileSize < playerPosYOnWorldMap + playerPosYOnScreen)
+                    if ((worldXMapPos + tileSize) > (playerPosXOnWorldMap - playerPosXOnScreen) &&
+                            (worldXMapPos - tileSize) < (playerPosXOnWorldMap + playerPosXOnScreen) &&
+                            (worldYMapPos + tileSize) > (playerPosYOnWorldMap - playerPosYOnScreen) &&
+                            (worldYMapPos - tileSize) < (playerPosYOnWorldMap + playerPosYOnScreen))
                     {
                         // drawFasterByScalingImage does not make impact on performance on world tiles
                         // so we don't use it for world tiles

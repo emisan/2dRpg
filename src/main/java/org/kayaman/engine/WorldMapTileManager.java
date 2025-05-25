@@ -30,7 +30,7 @@ public class WorldMapTileManager {
     private int worldMapMaxRows;
 
     private final int[][] mapTileNumbers;
-    private Tile[] tiles;
+    private List<Tile> tiles;
 
     /**
      * Initializes new manager with amount of columns and rows filled with digits of a world (map).
@@ -129,21 +129,23 @@ public class WorldMapTileManager {
     public Tile[][] getTileMap()
     {
         Tile[][] map = null;
-        if (mapTileNumbers != null && tiles.length > 0) {
+        int tileAmount = tiles.size();
+        if (mapTileNumbers != null && tileAmount > 0)
+        {
             map = new Tile[worldMapMaxRows][worldMapMaxColumns];
             // load map, line by line and add image for related number according world configuration
-            int x = 0;
-            int y = 0;
-            for(int row = 0; row < worldMapMaxRows; row++, x++) {
-                for(int column = 0; column < worldMapMaxColumns; column++, y++) {
+            for(int row = 0; row < worldMapMaxRows; row++)
+            {
+                for(int column = 0; column < worldMapMaxColumns; column++)
+                {
                     final int tileNum = mapTileNumbers[row][column];
-                    if (indexExistsInTilesOfThisWorld(tileNum, tiles.length)) {
-                        map[row][column] = tiles[tileNum];
-                    }
+                    Tile tile = null;
+                    if (indexExistsInTilesOfThisWorld(tileNum, tileAmount))
+                        tile = tiles.stream().filter(t -> t.getTileNumber() == tileNum).findFirst().orElse(null);
+                    if (tile != null)
+                        map[row][column] = tile;
                     else
-                    {
                         LOGGER.log(Level.WARNING, () -> TILE_NUM_NOT_INDEXED);
-                    }
                 }
             }
         }
@@ -153,7 +155,7 @@ public class WorldMapTileManager {
         return map;
     }
 
-    public void setMapTiles(@NonNull final Tile[] tilesOfThisWorld) {
-        tiles =tilesOfThisWorld;
+    public void setMapTiles(@NonNull final List<Tile> tilesOfThisWorld) {
+        tiles = tilesOfThisWorld;
     }
 }

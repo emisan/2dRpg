@@ -4,16 +4,21 @@ import lombok.NonNull;
 import org.kayaman.engine.GameEngine;
 import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
 import org.kayaman.engine.handler.RectangleTileCollisionDetector;
-import org.kayaman.engine.controls.GameCharacterKeyboardController;
+import org.kayaman.engine.controls.GameCharacterMoveController;
 import org.kayaman.loader.SpriteLoader;
 import org.kayaman.screen.GameScreen;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.kayaman.engine.controls.GameCharacterMoveController.LAST_DIRECTION_DOWN;
+import static org.kayaman.engine.controls.GameCharacterMoveController.LAST_DIRECTION_LEFT;
+import static org.kayaman.engine.controls.GameCharacterMoveController.LAST_DIRECTION_RIGHT;
+import static org.kayaman.engine.controls.GameCharacterMoveController.LAST_DIRECTION_UP;
 
 public class Player implements GameCharacter {
 
@@ -45,15 +50,14 @@ public class Player implements GameCharacter {
     private RectangleTileCollisionDetector playCollisionDetection;
     private RectangleGameObjectCollisionDetection gameObjectCollisionDetection;
 
-    private GameCharacterKeyboardController gameCharacterKeyboardController;
+    private boolean canMove;
+
+    private GameCharacterMoveController moveController;
 
     private final GameScreen gameScreen;
 
-    private final Font font;
-
     public Player(@NonNull GameScreen gameScreen)
     {
-        font = new Font("Arial", Font.PLAIN, 14);
         this.gameScreen = gameScreen;
         setDefaults();
         initMovementImages();
@@ -66,6 +70,7 @@ public class Player implements GameCharacter {
         downCounter = -1;
         imageUpdateSpeed = 12;
         imageUpdateCounter = 0;
+        canMove = true;
         tileSize = gameScreen.getTileSize();
         // where player starts on world x-index and y-index world map array coordinates multiplied by tileSize
         // this affects moving through the world x-y- index coordinates
@@ -76,7 +81,7 @@ public class Player implements GameCharacter {
         yPosOnScreen = gameScreen.getHeight()/2 - tileSize/2;
         movementSpeed = 4;
         collisionArea = new Rectangle(tileSize/4, tileSize/2, tileSize/2, tileSize/2);
-        gameCharacterKeyboardController = new GameCharacterKeyboardController();
+        moveController = new GameCharacterMoveController(this);
     }
 
     private void initMovementImages() {
@@ -136,7 +141,7 @@ public class Player implements GameCharacter {
     private void updateUpMovementImages() {
         final BufferedImage[] movements = getUpMovements();
         final int movementEnd = movements.length;
-        final boolean moves = gameCharacterKeyboardController.getUpPressed();
+        final boolean moves = moveController.getUpPressed() && moveController.canMove();
         if (moves && upCounter < movementEnd) {
             upCounter++;
         }
@@ -153,7 +158,7 @@ public class Player implements GameCharacter {
     public void updateDownMovementImages() {
         final BufferedImage[] movements = getDownMovements();
         final int movementEnd = movements.length;
-        final boolean moves = gameCharacterKeyboardController.getDownPressed();
+        final boolean moves = moveController.getDownPressed() && moveController.canMove();
         if (moves && downCounter < movementEnd) {
             downCounter++;
         }
@@ -170,7 +175,7 @@ public class Player implements GameCharacter {
     private void updateLeftMovementImages() {
         final BufferedImage[] movements = getLeftMovements();
         final int movementEnd = movements.length;
-        final boolean moves = gameCharacterKeyboardController.getLeftPressed();
+        final boolean moves = moveController.getLeftPressed() && moveController.canMove();
         if (moves && leftCounter < movementEnd) {
             leftCounter++;
         }
@@ -187,7 +192,7 @@ public class Player implements GameCharacter {
     private void updateRightMovementImages() {
         final BufferedImage[] movements = getRightMovements();
         final int movementEnd = movements.length;
-        final boolean moves = gameCharacterKeyboardController.getRightPressed();
+        final boolean moves = moveController.getRightPressed() && moveController.canMove();
         if (moves && rightCounter < movementEnd) {
             rightCounter++;
         }
@@ -201,19 +206,19 @@ public class Player implements GameCharacter {
         }
     }
 
-    private void setUpdateToFirstImageStandingStillRelatedToDirection(@NonNull final String direction) {
+    private void setImageStandingStillRelatedToDirection(@NonNull final String direction) {
         BufferedImage image = null;
         switch (direction) {
-            case GameCharacterKeyboardController.LAST_DIRECTION_UP:
+            case LAST_DIRECTION_UP:
                 image = getUpMovements()[0];
                 break;
-            case GameCharacterKeyboardController.LAST_DIRECTION_DOWN:
+            case LAST_DIRECTION_DOWN:
                 image = getDownMovements()[0];
                 break;
-            case GameCharacterKeyboardController.LAST_DIRECTION_LEFT:
+            case LAST_DIRECTION_LEFT:
                 image = getLeftMovements()[0];
                 break;
-            case GameCharacterKeyboardController.LAST_DIRECTION_RIGHT:
+            case LAST_DIRECTION_RIGHT:
                 image = getRightMovements()[0];
                 break;
             default:
@@ -224,55 +229,77 @@ public class Player implements GameCharacter {
         }
     }
 
-    public void update(@NonNull final Graphics2D graphics2D) {
-        updateMovementAndCheckCollisions(graphics2D);
+    public void update() {
+        updateMovementAndCheckCollisions();
     }
 
-    private void updateMovementAndCheckCollisions(@NonNull final Graphics2D graphics2D) {
-        final boolean leftPressed = gameCharacterKeyboardController.getLeftPressed();
-        final boolean rightPressed = gameCharacterKeyboardController.getRightPressed();
-        final boolean upPressed = gameCharacterKeyboardController.getUpPressed();
-        final boolean downPressed = gameCharacterKeyboardController.getDownPressed();
-        final String direction = gameCharacterKeyboardController.getLastDirection();
+    private void updateMovementAndCheckCollisions() {
 
-        final boolean collision = playCollisionDetection.hasCollisionOnWorldTiles(this);
+        final boolean leftPressed = moveController.getLeftPressed();
+        final boolean rightPressed = moveController.getRightPressed();
+        final boolean upPressed = moveController.getUpPressed();
+        final boolean downPressed = moveController.getDownPressed();
+        final String direction = moveController.getLastDirection();
 
-        if (leftPressed && !collision) {
+        final boolean hasWorldTileCollision = playCollisionDetection.hasCollisionOnWorldTiles(this);
+        final boolean hasInteraction = hasGameObjectCollision() || hasObjectInteraction();
+//        System.out.println("World tile collision " + hasWorldTileCollision + ", Object collision " + hasGameObject);
+
+        this.canMove(true);
+        if (hasWorldTileCollision) {
+            this.canMove(false);
+        }
+        if (hasInteraction) {
+            LOGGER.log(Level.INFO, "Object collision");
+            this.canMove(false);
+        }
+//        System.out.println("Can move " + canMove);
+        moveController.hasMovement(isMoving());
+
+        if (leftPressed && isMoving()) {
             updateLeftMovementImages();
-            gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.LAST_DIRECTION_LEFT);
+            moveController.setLastDirection(LAST_DIRECTION_LEFT);
         }
-        else if (rightPressed && !collision) {
+        else if (rightPressed && isMoving()) {
             updateRightMovementImages();
-            gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.LAST_DIRECTION_RIGHT);
+            moveController.setLastDirection(LAST_DIRECTION_RIGHT);
         }
-        else if (upPressed && !collision) {
+        else if (upPressed && isMoving()) {
             updateUpMovementImages();
-            gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.LAST_DIRECTION_UP);
+            moveController.setLastDirection(LAST_DIRECTION_UP);
         }
-        else if (downPressed && !collision) {
+        else if (downPressed && isMoving()) {
             updateDownMovementImages();
-            gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.LAST_DIRECTION_DOWN);
+            moveController.setLastDirection(LAST_DIRECTION_DOWN);
         }
         else {
-            gameCharacterKeyboardController.setLastDirection(GameCharacterKeyboardController.STAND_STILL);
-            setUpdateToFirstImageStandingStillRelatedToDirection(direction);
-        }
-
-        if (!collision) {
-            checkGameObjectCollision(graphics2D);
+            moveController.setLastDirection(GameCharacterMoveController.STAND_STILL);
+            setImageStandingStillRelatedToDirection(direction);
         }
     }
 
-    private void checkGameObjectCollision(@NonNull final Graphics2D graphics2D) {
+    private boolean hasGameObjectCollision() {
+        boolean state = false;
         final GameObject gameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
-        if (gameObject != null) {
-            gameScreen.getSoundFxLoader().playMusic("Pickup.mp3", false);
-            graphics2D.setFont(font);
-            graphics2D.setColor(Color.WHITE);
-            graphics2D.drawString("Picked up " + gameObject.getItemName(), 20, 100);
-            gameScreen.updateItemInventoryWindowWith(gameObject);
-            gameObjectCollisionDetection.removeGameObject(gameObject);
+        if (gameObject != null && gameObject.isCollectible()) {
+            state = gameObjectCollisionDetection.pickUp(gameScreen,gameObject);
+            LOGGER.log(Level.INFO, "picked up [{0}]", state);
         }
+//        else if (gameObject instanceof Door) {
+//            state = gameObjectCollisionDetection.doorOpened(gameScreen, (Door)gameObject);
+//            System.out.println("door opened" + state);
+//        }
+        return state;
+    }
+
+    private boolean hasObjectInteraction() {
+        boolean state = false;
+        final GameObject gameObject = gameObjectCollisionDetection.getGameObjectColliedWith(this);
+        if (gameObject instanceof Door) {
+            state = gameObjectCollisionDetection.doorOpened(gameScreen, (Door)gameObject);
+            LOGGER.log(Level.INFO, "door opened [{0}]", state);
+        }
+        return state;
     }
 
     private void drawCollisionArea(@NonNull final Graphics2D g) {
@@ -288,6 +315,16 @@ public class Player implements GameCharacter {
         GameEngine.drawFasterByScalingImage(
                 graphics2d, getActualImage(), getTileSize(), getXPosOnScreen(), getYPosOnScreen());
 //        drawCollisionArea(g2);
+    }
+
+    @Override
+    public void canMove(boolean state) {
+        canMove = state;
+    }
+
+    @Override
+    public boolean isMoving() {
+        return this.canMove;
     }
 
     @Override
@@ -362,14 +399,14 @@ public class Player implements GameCharacter {
 
     @Override
     public void setGameCharacterKeyboardController(
-            final GameCharacterKeyboardController gameCharacterKeyboardController)
+            final GameCharacterMoveController gameCharacterMoveController)
     {
-        this.gameCharacterKeyboardController = gameCharacterKeyboardController;
+        this.moveController = gameCharacterMoveController;
     }
 
     @Override
-    public GameCharacterKeyboardController getGameCharacterKeyboardController() {
-        return gameCharacterKeyboardController;
+    public GameCharacterMoveController getGameCharacterKeyboardController() {
+        return moveController;
     }
 
     @Override

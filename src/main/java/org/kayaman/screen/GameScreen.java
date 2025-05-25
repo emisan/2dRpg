@@ -11,7 +11,7 @@ import org.kayaman.engine.handler.RectangleTileCollisionDetector;
 import org.kayaman.loader.SoundLoader;
 import org.kayaman.loader.WorldMapLoader;
 import org.kayaman.scene.World;
-import org.kayaman.scene.world.one.WorldOneGameObjects;
+import org.kayaman.scene.world.one.WorldOne;
 
 import javax.swing.JPanel;
 import java.awt.Color;
@@ -44,6 +44,8 @@ public class GameScreen extends JPanel implements Runnable {
 
     private final transient SoundLoader bgMusicLoader;
     private final transient SoundLoader soundFxLoader;
+    private final transient OnScreenUI onScreenUI;
+
     private transient Thread gameThread;
     private transient Player player;
     private transient World world;
@@ -63,7 +65,8 @@ public class GameScreen extends JPanel implements Runnable {
         startGameThread();
         bgMusicLoader = new SoundLoader();
         soundFxLoader = new SoundLoader();
-        bgMusicLoader.playMusic("OnTheRoadAgain2.mp3", true);
+        onScreenUI = new OnScreenUI();
+        initWorldMusic();
     }
 
     private void setupGameField(int originalTileSize, int scale, int maxScreenCols, int maxScreenRows) {
@@ -90,7 +93,7 @@ public class GameScreen extends JPanel implements Runnable {
 
     private void initWorldMap() {
         world = WorldMapLoader.loadWorldOne(this);
-        world.setWorldGameObjects(WorldOneGameObjects.getGameObjects(getTileSize()));
+//        world.setWorldGameObjects(WorldOneGameObjects.getGameObjects(getTileSize()));
         maxWorldColumns = world.getMaxWorldColumns();
         final int maxWorldWidth = gpTileSize * maxWorldColumns;
         final int maxWorldHeight = gpTileSize * world.getMaxWorldRows();
@@ -137,18 +140,24 @@ public class GameScreen extends JPanel implements Runnable {
         gameThread.start();
     }
 
+    private void initWorldMusic() {
+        if (getWorld() instanceof WorldOne) {
+            bgMusicLoader.playMusic("World1.mp3", true);
+        }
+    }
+
     public void stopGame() {
         gameThread = null;
     }
 
-    //TODO
+    //TODO when zoom is used the world collision breaks : IndexArrayOutOfBoundsException
     /**
      * Actually when zooming this destroys rectangle collision detection. Need to fix this.
      * @param byFactor zooming factor
      */
     public void zoomInOut(final int byFactor) {
         final int oldWorldWidth = gpTileSize * maxWorldColumns;
-        // if only this is set, the comments in PlayerController-keyPressed will effect rendering
+        // if only this is set, the comments in PlayerController-keyPressed will affect rendering
         gpTileSize += byFactor;
         zoomFactor = byFactor;
         // beneath code must be commented to let the effect happen otherwise we'll have correct zoom in-out
@@ -176,7 +185,7 @@ public class GameScreen extends JPanel implements Runnable {
             itemInventoryWindow.updateLocation(
                     locationOnScreen.x + (getWidth() - itemInventoryWindow.getWidth()), locationOnScreen.y);
             // update the characters always, so that changed states are updated, like tileSize or collision, etc.
-            getPlayer().update(graphics2D);
+            getPlayer().update();
         }
     }
 
@@ -187,6 +196,7 @@ public class GameScreen extends JPanel implements Runnable {
         final long before = System.nanoTime();
         getWorld().drawMap(graphics2D);
         getPlayer().draw(graphics2D);
+        getOnScreenUI().draw(graphics2D);
         final long after = System.nanoTime();
         drawSystemMeasurements(graphics2D, before, after);
         graphics2D.dispose(); // graphics context and release any system resources that it is using
@@ -202,8 +212,8 @@ public class GameScreen extends JPanel implements Runnable {
         }
     }
 
-    public void updateItemInventoryWindowWith(@NonNull final GameObject gameObject) {
-        this.itemInventoryWindow.updateListModelWith(gameObject);
+    public void addToItemInventoryWindow(@NonNull final GameObject gameObject) {
+        this.itemInventoryWindow.addToListModel(gameObject);
     }
 
     public void openOrCloseInventory(final boolean state) {
@@ -249,7 +259,17 @@ public class GameScreen extends JPanel implements Runnable {
         GameEngine.deltaAccumulaterGameLoop();
     }
 
-    public Graphics getGraphics2d() {
+    public ItemInventoryWindow getItemInventoryWindow()
+    {
+        return itemInventoryWindow;
+    }
+
+    public OnScreenUI getOnScreenUI()
+    {
+        return onScreenUI;
+    }
+
+    public Graphics2D getGraphics2d() {
         return graphics2D;
     }
 }

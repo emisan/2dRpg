@@ -1,7 +1,7 @@
 package org.kayaman.engine.handler;
 
 import lombok.NonNull;
-import org.kayaman.engine.controls.GameCharacterKeyboardController;
+import org.kayaman.engine.controls.GameCharacterMoveController;
 import org.kayaman.entities.GameCharacter;
 import org.kayaman.scene.Tile;
 
@@ -162,19 +162,19 @@ public class RectangleTileCollisionDetector implements CollisionDetector {
         final String lastDirection = gameCharacter.getGameCharacterKeyboardController().getLastDirection();
         switch (lastDirection)
         {
-            case GameCharacterKeyboardController.LAST_DIRECTION_LEFT:
+            case GameCharacterMoveController.LAST_DIRECTION_LEFT:
                 collision = hasCollisionWhenMovingLeft(collisionMap);
                 gameCharacter.setXPosOnWorld(characterWorldXPos);
                 break;
-            case GameCharacterKeyboardController.LAST_DIRECTION_RIGHT:
+            case GameCharacterMoveController.LAST_DIRECTION_RIGHT:
                 collision = hasCollisionWhenMovingRight(collisionMap);
                 gameCharacter.setXPosOnWorld(characterWorldXPos);
                 break;
-            case GameCharacterKeyboardController.LAST_DIRECTION_UP:
+            case GameCharacterMoveController.LAST_DIRECTION_UP:
                 collision = hasCollisionWhenMovingUp(collisionMap);
                 gameCharacter.setYPosOnWorld(characterWorldYPos);
                 break;
-            case GameCharacterKeyboardController.LAST_DIRECTION_DOWN:
+            case GameCharacterMoveController.LAST_DIRECTION_DOWN:
                 collision = hasCollisionWhenMovingDown(collisionMap);
                 gameCharacter.setYPosOnWorld(characterWorldYPos);
                 break;

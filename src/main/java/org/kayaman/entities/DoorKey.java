@@ -4,12 +4,8 @@ import lombok.NonNull;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DoorKey implements GameObject {
-
-    private static final Logger LOGGER = Logger.getLogger(DoorKey.class.getName());
 
     private int worldXPos;
     private int worldYPos;
@@ -62,5 +58,10 @@ public class DoorKey implements GameObject {
     @Override
     public Rectangle getCollisionArea() {
         return collisionArea;
+    }
+
+    @Override
+    public boolean isCollectible() {
+        return true;
     }
 }

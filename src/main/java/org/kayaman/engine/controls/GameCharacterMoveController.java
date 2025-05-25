@@ -1,11 +1,12 @@
 package org.kayaman.engine.controls;
 
 import lombok.NonNull;
+import org.kayaman.entities.GameCharacter;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class GameCharacterKeyboardController extends KeyAdapter {
+public class GameCharacterMoveController extends KeyAdapter {
 
     public static final String STAND_STILL = "stand_still";
     public static final String LAST_DIRECTION_UP = "up";
@@ -18,28 +19,32 @@ public class GameCharacterKeyboardController extends KeyAdapter {
     private boolean downPressed;
     private boolean leftPressed;
     private boolean rightPressed;
+    private boolean canMove;
 
     private String lastDirection;
 
-    public GameCharacterKeyboardController() {
+    public GameCharacterMoveController(@NonNull final GameCharacter gameCharacter) {
+        this.hasMovement(gameCharacter.isMoving());
         lastDirection = STAND_STILL;
+    }
+
+    private void setNonPressed() {
+        upPressed = leftPressed = downPressed = rightPressed = false;
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-        if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
+        if (canMove && (code == KeyEvent.VK_W || code == KeyEvent.VK_UP))
             upPressed = true;
-        }
-        else if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) {
+        else if (canMove && (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT))
             leftPressed = true;
-        }
-        else if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
+        else if (canMove && (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN))
             downPressed = true;
-        }
-        else if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) {
+        else if (canMove && (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT))
             rightPressed = true;
-        }
+        else
+            setNonPressed();
     }
 
     @Override
@@ -86,5 +91,13 @@ public class GameCharacterKeyboardController extends KeyAdapter {
 
     public boolean getRightPressed() {
         return rightPressed;
+    }
+
+    public void hasMovement(final boolean canMove) {
+        this.canMove = canMove;
+    }
+
+    public boolean canMove() {
+        return canMove;
     }
 }

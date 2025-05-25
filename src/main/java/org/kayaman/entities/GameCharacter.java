@@ -1,7 +1,7 @@
 package org.kayaman.entities;
 
 import lombok.NonNull;
-import org.kayaman.engine.controls.GameCharacterKeyboardController;
+import org.kayaman.engine.controls.GameCharacterMoveController;
 import org.kayaman.engine.handler.RectangleGameObjectCollisionDetection;
 import org.kayaman.engine.handler.RectangleTileCollisionDetector;
 
@@ -32,8 +32,8 @@ public interface GameCharacter {
     void setCollisionArea(final Rectangle collisionArea);
     Rectangle getCollisionArea();
 
-    void setGameCharacterKeyboardController(final GameCharacterKeyboardController gameCharacterKeyboardController);
-    GameCharacterKeyboardController getGameCharacterKeyboardController();
+    void setGameCharacterKeyboardController(final GameCharacterMoveController gameCharacterMoveController);
+    GameCharacterMoveController getGameCharacterKeyboardController();
 
     void setCollisionDetector(@NonNull final RectangleTileCollisionDetector collisionDetector);
     RectangleTileCollisionDetector getCollisionDetector();
@@ -42,4 +42,7 @@ public interface GameCharacter {
     RectangleGameObjectCollisionDetection getGameObjectsCollisionDetector();
 
     void draw(@NonNull final Graphics2D graphics2D);
+
+    void canMove(final boolean state);
+    boolean isMoving();
 }

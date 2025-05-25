@@ -6,13 +6,10 @@ import org.kayaman.screen.GameScreen;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.logging.Logger;
 
 public final class GameEngine {
 
-    private static final Logger LOGGER = Logger.getLogger(GameEngine.class.getName());
-
-    private static final int FRAMES_PER_SECOND = 60;
+    public static final int FRAMES_PER_SECOND = 60;
     private static final double ONE_BILLION_NANOSECEONDS = 1000000000.0;
     private static final double DRAW_INTERVAL = ONE_BILLION_NANOSECEONDS/FRAMES_PER_SECOND;
     private static GameScreen gameScreen;
@@ -43,7 +40,7 @@ public final class GameEngine {
 
         while (gameScreen.getThread() != null) {
             currentTime = System.nanoTime();
-            double passedTime = currentTime - lastTime;
+            double passedTime = currentTime - (double)lastTime;
             delta += passedTime / DRAW_INTERVAL;
             lastTime = currentTime;
             // only used for output of fps , otherwhise leave commented

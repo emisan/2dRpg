@@ -29,7 +29,7 @@ public final class WorldOneTiles {
                                       final boolean colliedAble)
     {
         final BufferedImage sprite = SpriteLoader.getSprite(resourcePath + tilePicName);
-        if (sprite != null && tileSizeInThisWorld > 0)
+        if (tileSizeInThisWorld > 0)
         {
             tilesOfThisWorld.add(
                     new Tile(sprite, tileSizeInThisWorld, tileSizeInThisWorld, tileNumberOnWorldMap, colliedAble));
@@ -37,12 +37,34 @@ public final class WorldOneTiles {
     }
 
     private static void addGroundTiles() {
+        addGroundElements();
+        addBuildings();
+    }
+
+    private static void addGroundElements() {
         // tileNum 0
         addToTileList(WORLD_FOLDER, "forest.png", 0, true);
         // tileNum 1
         addToTileList(WORLD_FOLDER, "grass_light.png", 1, false);
+        // tileNum 14
+        addToTileList(WORLD_FOLDER, "grass_light_right.png", 14, false);
         // tileNum 2
         addToTileList(WORLD_FOLDER, "sand.png", 2, false);
+        addTrees();
+    }
+
+    private static void addTrees() {
+        // tileNum 10
+        addToTileList(WORLD_FOLDER, "tree_left_border_sand.png", 10, true);
+        // tileNum 11
+        addToTileList(WORLD_FOLDER, "tree_right_border_sand.png", 11, true);
+        // tileNum 12
+        addToTileList(WORLD_FOLDER, "tree_top_border_sand.png", 12, true);
+        // tileNum 13
+        addToTileList(WORLD_FOLDER, "tree_bottom_border_sand.png", 13, true);
+    }
+
+    private static void addBuildings() {
         // tileNum 3
         addToTileList(BUILDING_FOLDER, "brown_bricked_wall_down_left.png", 3, true);
         // tileNum 4
@@ -59,12 +81,12 @@ public final class WorldOneTiles {
         addToTileList(BUILDING_FOLDER, "brown_bricked_wall_front_backyard.png", 9, true);
     }
 
-    public static Tile[] getTilesOfThisWorld(final int tileSize) {
+    public static List<Tile> getTilesOfThisWorld(final int tileSize) {
         if (tilesOfThisWorld == null) {
             setTileSizeInThisWorld(tileSize);
             tilesOfThisWorld = new ArrayList<>();
             addGroundTiles();
         }
-        return tilesOfThisWorld.toArray(new Tile[0]);
+        return tilesOfThisWorld;
     }
 }
